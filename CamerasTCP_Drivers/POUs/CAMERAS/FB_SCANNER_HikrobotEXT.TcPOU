@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_SCANNER_HikrobotEXT" Id="{2eca3199-12e6-42e0-b507-63e823613e71}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_SCANNER_HikrobotEXT
+VAR_INPUT
+	bEnable							: BOOL;
+	strScannerIPAddr				: T_IPv4Addr	:= '192.168.1.109';
+	nReceiveScannerPortNo			: UINT			:= 50000;
+	nExecuteCommandScannerPortNo	: UINT			:= 4001;
+END_VAR
+
+VAR_OUTPUT
+	eSocketReceiveState		: E_SocketConnectionState;
+	eSocketSendState		: E_SocketConnectionState;
+END_VAR
+
+VAR
+	fbTCPPortCtrl_Receive	: FB_TCP_ClientPortCtrl;
+	fbTCPortCtrlP_Send		: FB_TCP_ClientPortCtrl;
+	fbTCPReceive			: FB_ReceiveString;
+	strTCPRxString			: T_MaxString;
+	ftrigEnable				: F_TRIG;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+Connect();
+
+Receive();
+
+]]></ST>
+    </Implementation>
+    <Action Name="Connect" Id="{19033c27-8bdc-4ad1-b4f2-22164cb8860c}">
+      <Implementation>
+        <ST><![CDATA[
+(* TCP Receive Socket establish connect *)
+fbTCPPortCtrl_Receive(
+	bEnable				:= bEnable, 
+	strRemoteIPAddr		:= strScannerIPAddr, 
+	nRemotePortNo		:= nReceiveScannerPortNo, 
+	tReconnectTime		:= T#20S, 
+	eSocketState		=> eSocketReceiveState, 
+	bError				=> , 
+	nErrorID			=> );
+	
+(* TCP Send Socket establish connect *)
+fbTCPortCtrlP_Send(
+	bEnable				:= bEnable, 
+	strRemoteIPAddr		:= strScannerIPAddr, 
+	nRemotePortNo		:= nExecuteCommandScannerPortNo, 
+	tReconnectTime		:= T#20S, 
+	eSocketState		=> eSocketSendState, 
+	bError				=> , 
+	nErrorID			=> );]]></ST>
+      </Implementation>
+    </Action>
+    <Action Name="Receive" Id="{708aaa89-8818-4a32-bfe8-6fffb45be551}">
+      <Implementation>
+        <ST><![CDATA[
+ftrigEnable(CLK := bEnable);
+IF ftrigEnable.Q THEN
+	strTCPRxString := ''; (* clears input buffer *)
+END_IF
+
+(* poll TCP port receive string *)
+fbTCPReceive(
+	bEnable			:= fbTCPPortCtrl_Receive.bConnected,
+	hSocket			:= fbTCPPortCtrl_Receive.hSocket,
+	tUpdateTime		:= T#100MS,
+	strTCPRxString	:= strTCPRxString
+);]]></ST>
+      </Implementation>
+    </Action>
+  </POU>
+</TcPlcObject>
