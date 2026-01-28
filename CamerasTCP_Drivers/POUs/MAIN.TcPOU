@@ -4,15 +4,43 @@
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
 	fbSiemensCameraMV5xCtrl		: FB_SiemensCameraMV5xCtrl;
+	
+	//test just the connection
+// 	fbTCPSocketCtrl		: FB_ClientServerConnection;
+// 	bEnable				: BOOL;
+// 	strScannerIPAddr	: T_IPv4Addr	:= '192.168.1.101';
+// 	nScannerPortNo		: UINT			:= 2010;
+// 	bError				: BOOL;
+// 	nErrorID			: UDINT;
+// 	hSocket				: T_HSOCKET;
+// 	eSocketState		: E_SocketConnectionState;
+
+	fbHikrobotScannerCtrl		: FB_SCANNER_HikrobotEXT;
+	
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[
-fbSiemensCameraMV5xCtrl();
+//fbSiemensCameraMV5xCtrl();
 
-PRG_Test();
+//PRG_Test();
 //PRG_ButtonsHandler();
-]]></ST>
+
+(* TCP test just the connection *)
+// fbTCPSocketCtrl(
+// 	sSrvNetID	:= '',
+// 	nMode		:= CONNECT_MODE_ENABLEDBG,
+// 	sRemoteHost	:= strScannerIPAddr,
+// 	nRemotePort	:= nScannerPortNo,
+// 	bEnable		:= bEnable,
+// 	tReconnect	:= T#45S,
+// 	bError		=> bError,
+// 	nErrID		=> nErrorID,
+// 	hSocket		=> hSocket,  
+// 	eState		=> eSocketState
+// );
+
+fbHikrobotScannerCtrl();]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>

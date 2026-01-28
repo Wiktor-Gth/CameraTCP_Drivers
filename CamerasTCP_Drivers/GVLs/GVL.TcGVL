@@ -4,7 +4,21 @@
     <Declaration><![CDATA[{attribute 'qualified_only'}
 VAR_GLOBAL
 	bSiemensTriggerButton		AT %I* : BOOL;			
-	bSiemensTriggerOutput		AT %Q* : BOOL;				
+	bSiemensTriggerOutput		AT %Q* : BOOL;		
+
+
+	// Hikrobot Control Commands
+
+	aHikrobotCtrlCommands				: ARRAY[1..20] OF STRING(20) :=[
+		(*start user params 0*) '<Set,UserStart,0>',
+		(*start user params 1*) '<Set,UserStart,1>',
+		(*start user params 2*) '<Set,UserStart,2>',
+		(*nazwa komendy*) '',
+		(*nazwa komendy*) '',
+		(*nazwa komendy*) '',
+		(*nazwa komendy*) ''
+];
+		
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

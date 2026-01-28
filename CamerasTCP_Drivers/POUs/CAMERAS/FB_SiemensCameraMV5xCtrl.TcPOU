@@ -5,8 +5,8 @@
 
 VAR_INPUT
 	bEnable				: BOOL;
-	strScannerIPAddr	: T_IPv4Addr	:= '192.168.1.44';
-	nScannerPortNo		: UINT			:= 50000;
+	strScannerIPAddr	: T_IPv4Addr	:= '192.168.1.101';
+	nScannerPortNo		: UINT			:= 2010;
 END_VAR
 
 VAR_OUTPUT

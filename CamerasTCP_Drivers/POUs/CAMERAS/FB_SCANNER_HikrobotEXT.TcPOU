@@ -3,10 +3,11 @@
   <POU Name="FB_SCANNER_HikrobotEXT" Id="{2eca3199-12e6-42e0-b507-63e823613e71}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_SCANNER_HikrobotEXT
 VAR_INPUT
-	bEnable							: BOOL;
+	bEnableReceive					: BOOL;
+	bEnableSend						: BOOL;
 	strScannerIPAddr				: T_IPv4Addr	:= '192.168.1.109';
 	nReceiveScannerPortNo			: UINT			:= 50000;
-	nExecuteCommandScannerPortNo	: UINT			:= 4001;
+	nSendScannerPortNo				: UINT			:= 4001;
 END_VAR
 
 VAR_OUTPUT
@@ -16,10 +17,21 @@ END_VAR
 
 VAR
 	fbTCPPortCtrl_Receive	: FB_TCP_ClientPortCtrl;
-	fbTCPortCtrlP_Send		: FB_TCP_ClientPortCtrl;
+	bReceiveConnected		: BOOL;
+	fbTCPortCtrl_Send		: FB_TCP_ClientPortCtrl;
+	bSendConnected			: BOOL;
 	fbTCPReceive			: FB_ReceiveString;
 	strTCPRxString			: T_MaxString;
 	ftrigEnable				: F_TRIG;
+	
+	/////// send command
+	
+	fbTCPSend				: FB_SocketSend;
+	bSendCommand			: BOOL;
+	nCommandNo				: UINT;
+	strTCPCommand			: STRING(20);
+	fbTCPSendDone			: F_TRIG;
+	nSendErrId				: UDINT;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -28,6 +40,10 @@ Connect();
 
 Receive();
 
+Send();
+
+
+
 ]]></ST>
     </Implementation>
     <Action Name="Connect" Id="{19033c27-8bdc-4ad1-b4f2-22164cb8860c}">
@@ -35,29 +51,33 @@ Receive();
         <ST><![CDATA[
 (* TCP Receive Socket establish connect *)
 fbTCPPortCtrl_Receive(
-	bEnable				:= bEnable, 
+	bEnable				:= bEnableReceive, 
 	strRemoteIPAddr		:= strScannerIPAddr, 
 	nRemotePortNo		:= nReceiveScannerPortNo, 
 	tReconnectTime		:= T#20S, 
 	eSocketState		=> eSocketReceiveState, 
 	bError				=> , 
-	nErrorID			=> );
+	nErrorID			=>,
+	bConnected			=> bReceiveConnected
+ );
 	
 (* TCP Send Socket establish connect *)
-fbTCPortCtrlP_Send(
-	bEnable				:= bEnable, 
+fbTCPortCtrl_Send(
+	bEnable				:= bEnableSend, 
 	strRemoteIPAddr		:= strScannerIPAddr, 
-	nRemotePortNo		:= nExecuteCommandScannerPortNo, 
+	nRemotePortNo		:= nSendScannerPortNo, 
 	tReconnectTime		:= T#20S, 
 	eSocketState		=> eSocketSendState, 
 	bError				=> , 
-	nErrorID			=> );]]></ST>
+	nErrorID			=>, 
+	bConnected			=> bSendConnected
+);]]></ST>
       </Implementation>
     </Action>
     <Action Name="Receive" Id="{708aaa89-8818-4a32-bfe8-6fffb45be551}">
       <Implementation>
         <ST><![CDATA[
-ftrigEnable(CLK := bEnable);
+ftrigEnable(CLK := bEnableReceive);
 IF ftrigEnable.Q THEN
 	strTCPRxString := ''; (* clears input buffer *)
 END_IF
@@ -69,6 +89,40 @@ fbTCPReceive(
 	tUpdateTime		:= T#100MS,
 	strTCPRxString	:= strTCPRxString
 );]]></ST>
+      </Implementation>
+    </Action>
+    <Action Name="Send" Id="{4218bcf5-c66e-417f-ac74-e628208b0859}">
+      <Implementation>
+        <ST><![CDATA[
+strTCPCommand 	:= GVL.aHikrobotCtrlCommands[nCommandNo];
+
+fbTCPSend(
+	sSrvNetId	:= '',
+	hSocket		:= fbTCPortCtrl_Send.hSocket,
+	cbLen		:= TO_UDINT(LEN(strTCPCommand)),
+	pSrc		:= ADR(strTCPCommand),
+	bExecute	:= bSendCommand,
+	tTimeout	:= T#1s
+);
+
+(* send data complete *)
+fbTCPSendDone(CLK := fbTCPSend.bBusy);
+(* TCP send complete *)
+
+IF fbTCPSend.bError = TRUE THEN
+	nSendErrId := fbTCPSend.nErrId;
+ELSE
+	nSendErrId := 0;	
+END_IF
+
+IF fbTCPSendDone.Q = TRUE THEN
+
+	(* clear strTCPCommand *)
+	strTCPCommand := '';
+
+	(* close off fbSendTCPData *)
+	fbTCPSend(bExecute := FALSE);
+END_IF]]></ST>
       </Implementation>
     </Action>
   </POU>
