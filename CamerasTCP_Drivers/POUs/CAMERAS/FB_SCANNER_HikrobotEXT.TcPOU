@@ -5,7 +5,7 @@
 VAR_INPUT
 	bEnableReceive					: BOOL;
 	bEnableSend						: BOOL;
-	strScannerIPAddr				: T_IPv4Addr	:= '192.168.1.109';
+	strScannerIPAddr				: T_IPv4Addr	:= '192.168.80.130';
 	nReceiveScannerPortNo			: UINT			:= 50000;
 	nSendScannerPortNo				: UINT			:= 4001;
 END_VAR
@@ -21,14 +21,17 @@ VAR
 	fbTCPortCtrl_Send		: FB_TCP_ClientPortCtrl;
 	bSendConnected			: BOOL;
 	fbTCPReceive			: FB_ReceiveString;
+	fbTCPReceiveAfterSend	: FB_ReceiveString;
 	strTCPRxString			: T_MaxString;
+	strTCPRxString_Reply	: T_MaxString;
 	ftrigEnable				: F_TRIG;
 	
 	/////// send command
 	
 	fbTCPSend				: FB_SocketSend;
+	rTrigSend				: R_TRIG;
 	bSendCommand			: BOOL;
-	nCommandNo				: UINT;
+	nCommandNo				: UINT := 1;
 	strTCPCommand			: STRING(20);
 	fbTCPSendDone			: F_TRIG;
 	nSendErrId				: UDINT;
@@ -94,14 +97,17 @@ fbTCPReceive(
     <Action Name="Send" Id="{4218bcf5-c66e-417f-ac74-e628208b0859}">
       <Implementation>
         <ST><![CDATA[
-strTCPCommand 	:= GVL.aHikrobotCtrlCommands[nCommandNo];
+rTrigSend(CLK := bSendCommand);
+IF rTrigSend.Q THEN
+	strTCPCommand 	:= GVL.aHikrobotCtrlCommands[nCommandNo];	
+END_IF
 
 fbTCPSend(
 	sSrvNetId	:= '',
 	hSocket		:= fbTCPortCtrl_Send.hSocket,
 	cbLen		:= TO_UDINT(LEN(strTCPCommand)),
 	pSrc		:= ADR(strTCPCommand),
-	bExecute	:= bSendCommand,
+	bExecute	:= rTrigSend.Q,
 	tTimeout	:= T#1s
 );
 
@@ -122,7 +128,16 @@ IF fbTCPSendDone.Q = TRUE THEN
 
 	(* close off fbSendTCPData *)
 	fbTCPSend(bExecute := FALSE);
-END_IF]]></ST>
+END_IF
+
+// expece response after sending command
+
+fbTCPReceiveAfterSend(
+	bEnable			:= bSendCommand AND fbTCPortCtrl_Send.bConnected,
+	hSocket			:= fbTCPortCtrl_Send.hSocket,
+	tUpdateTime		:= T#100MS,
+	strTCPRxString	:= strTCPRxString_Reply
+);]]></ST>
       </Implementation>
     </Action>
   </POU>

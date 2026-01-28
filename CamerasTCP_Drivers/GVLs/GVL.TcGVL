@@ -10,13 +10,13 @@ VAR_GLOBAL
 	// Hikrobot Control Commands
 
 	aHikrobotCtrlCommands				: ARRAY[1..20] OF STRING(20) :=[
-		(*start user params 0*) '<Set,UserStart,0>',
-		(*start user params 1*) '<Set,UserStart,1>',
-		(*start user params 2*) '<Set,UserStart,2>',
-		(*nazwa komendy*) '',
-		(*nazwa komendy*) '',
-		(*nazwa komendy*) '',
-		(*nazwa komendy*) ''
+		(*start user params 0*) 		'<Set,UserStart,0>',
+		(*start user params 1*) 		'<Set,UserStart,1>',
+		(*start user params 2*) 		'<Set,UserStart,2>',
+		(*execute self adjustement*) 	'<Exec,Tune>',
+		(*start reading codes*) 		'<Set,Acq,1>',
+		(*stop reading codes*) 			'<Set,Acq,0>',
+		(*camera reboot*) 				'<Exec,Reboot>'
 ];
 		
 END_VAR]]></Declaration>
