@@ -5,8 +5,8 @@
 VAR_INPUT
 	bEnableReceive					: BOOL;
 	bEnableSend						: BOOL;
-	strScannerIPAddr				: T_IPv4Addr	:= '192.168.80.130';
-	nReceiveScannerPortNo			: UINT			:= 50000;
+	strScannerIPAddr				: T_IPv4Addr	:= '192.168.1.45';
+	nReceiveScannerPortNo			: UINT			:= 2010;
 	nSendScannerPortNo				: UINT			:= 4001;
 END_VAR
 
@@ -25,6 +25,9 @@ VAR
 	strTCPRxString			: T_MaxString;
 	strTCPRxString_Reply	: T_MaxString;
 	ftrigEnable				: F_TRIG;
+	
+	nIndex					: UINT;
+	nIndex2					: UINT;
 	
 	/////// send command
 	
@@ -91,7 +94,23 @@ fbTCPReceive(
 	hSocket			:= fbTCPPortCtrl_Receive.hSocket,
 	tUpdateTime		:= T#100MS,
 	strTCPRxString	:= strTCPRxString
-);]]></ST>
+);
+
+
+//*************** quick patch ****************//
+IF fbTCPReceive.bDataReceived THEN
+	GVL.aTCPxStrings[nIndex] := strTCPRxString;
+	nIndex := nIndex + 1;
+	strTCPRxString := '';
+END_IF
+	
+IF nIndex = 20 THEN
+	nIndex := 0;
+	FOR nIndex2 := 0 TO 20 DO
+		GVL.aTCPxStrings[nIndex2] := '';		
+	END_FOR
+END_IF
+//*************** quick patch ****************//]]></ST>
       </Implementation>
     </Action>
     <Action Name="Send" Id="{4218bcf5-c66e-417f-ac74-e628208b0859}">

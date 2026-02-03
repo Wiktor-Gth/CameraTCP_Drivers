@@ -52,6 +52,9 @@
     <Compile Include="POUs\TCP_FB\FB_ReceiveString.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Tests\IO_logic.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Tests\PRG_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>

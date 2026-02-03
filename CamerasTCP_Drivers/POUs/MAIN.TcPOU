@@ -40,6 +40,8 @@ END_VAR
 // 	eState		=> eSocketState
 // );
 
+IO_logic();
+
 fbHikrobotScannerCtrl();]]></ST>
     </Implementation>
   </POU>
