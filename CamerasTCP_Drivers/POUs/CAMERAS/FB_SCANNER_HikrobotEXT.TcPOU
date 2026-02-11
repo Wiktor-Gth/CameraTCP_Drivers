@@ -5,7 +5,7 @@
 VAR_INPUT
 	bEnableReceive					: BOOL;
 	bEnableSend						: BOOL;
-	strScannerIPAddr				: T_IPv4Addr	:= '192.168.1.45';
+	strScannerIPAddr				: T_IPv4Addr	:= '192.168.80.130';
 	nReceiveScannerPortNo			: UINT			:= 2010;
 	nSendScannerPortNo				: UINT			:= 4001;
 END_VAR
@@ -54,9 +54,9 @@ Connect();
 
 Receive();
 
-Send();
+//Send();
 
-
+Send_Sequence();
 
 ]]></ST>
     </Implementation>

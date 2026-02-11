@@ -3,18 +3,7 @@
   <POU Name="MAIN" Id="{57de771e-4346-4079-9379-3645d39749ca}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
-	fbSiemensCameraMV5xCtrl		: FB_SiemensCameraMV5xCtrl;
 	
-	//test just the connection
-// 	fbTCPSocketCtrl		: FB_ClientServerConnection;
-// 	bEnable				: BOOL;
-// 	strScannerIPAddr	: T_IPv4Addr	:= '192.168.1.101';
-// 	nScannerPortNo		: UINT			:= 2010;
-// 	bError				: BOOL;
-// 	nErrorID			: UDINT;
-// 	hSocket				: T_HSOCKET;
-// 	eSocketState		: E_SocketConnectionState;
-
 	fbHikrobotScannerCtrl		: FB_SCANNER_HikrobotEXT;
 	
 END_VAR
@@ -26,23 +15,11 @@ END_VAR
 //PRG_Test();
 //PRG_ButtonsHandler();
 
-(* TCP test just the connection *)
-// fbTCPSocketCtrl(
-// 	sSrvNetID	:= '',
-// 	nMode		:= CONNECT_MODE_ENABLEDBG,
-// 	sRemoteHost	:= strScannerIPAddr,
-// 	nRemotePort	:= nScannerPortNo,
-// 	bEnable		:= bEnable,
-// 	tReconnect	:= T#45S,
-// 	bError		=> bError,
-// 	nErrID		=> nErrorID,
-// 	hSocket		=> hSocket,  
-// 	eState		=> eSocketState
-// );
+//IO_logic();
 
-IO_logic();
+//fbHikrobotScannerCtrl();
 
-fbHikrobotScannerCtrl();]]></ST>
+Outer_IN_Case_Duplicat();]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>

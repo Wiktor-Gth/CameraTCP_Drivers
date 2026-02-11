@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="Outer_IN_Case_Duplicat" Id="{88e09d72-4e5c-4dea-a230-63df1449db0e}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Outer_IN_Case_Duplicat
+VAR
+		
+	fbFIND_OuterDuplicates		: FB_FIND_OuterDuplicates;
+	
+	bHasDuplicates				: BOOL;
+	nDuplicateCount				: UINT;
+	
+	rTrig						: R_TRIG;
+	bExecute					: BOOL;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+CaseDataAdd();
+
+rTrig(CLK := bExecute);
+
+IF rTrig.Q THEN	
+	fbFIND_OuterDuplicates(
+		stCase 			:= GVL_test.stCase, 
+		bHasDuplicates 	=> bHasDuplicates, 
+		nDuplicateCount => nDuplicateCount
+	);	
+	
+END_IF
+
+]]></ST>
+    </Implementation>
+    <Action Name="CaseDataAdd" Id="{94b866f2-fd59-4193-adbd-e54560636a75}">
+      <Implementation>
+        <ST><![CDATA[(*     outer 1 data     *)
+GVL_test.stCase.aOuters[1].sOuterCode 	:= 'OUTER1';
+GVL_test.stCase.aOuters[1].nOutersStatus	:= 5;
+// packs 1 data
+GVL_test.stCase.aOuters[1].aPacks[1].sPackCode 	:= 'PACK01OUTER1';
+GVL_test.stCase.aOuters[1].aPacks[1].nPackStatus := 5;
+// packs 2 data
+GVL_test.stCase.aOuters[1].aPacks[2].sPackCode 	:= 'PACK02OUTER1';
+GVL_test.stCase.aOuters[1].aPacks[2].nPackStatus := 5;
+// packs 3 data
+GVL_test.stCase.aOuters[1].aPacks[3].sPackCode 	:= 'PACK01OUTER1';
+GVL_test.stCase.aOuters[1].aPacks[3].nPackStatus := 5;
+
+
+(*     outer 2 data     *)
+GVL_test.stCase.aOuters[2].sOuterCode 	:= 'OUTER2';
+GVL_test.stCase.aOuters[2].nOutersStatus	:= 5;
+// packs 1 data
+GVL_test.stCase.aOuters[2].aPacks[1].sPackCode 	:= 'PACK01OUTER1';
+GVL_test.stCase.aOuters[2].aPacks[1].nPackStatus := 5;
+// packs 2 data
+GVL_test.stCase.aOuters[2].aPacks[2].sPackCode 	:= 'PACK03OUTER2';
+GVL_test.stCase.aOuters[2].aPacks[2].nPackStatus := 5;
+// packs 3 data
+GVL_test.stCase.aOuters[2].aPacks[3].sPackCode 	:= 'PACK03OUTER2';
+GVL_test.stCase.aOuters[2].aPacks[3].nPackStatus := 5;
+
+
+(*     outer 3 data     *)
+GVL_test.stCase.aOuters[3].sOuterCode 	:= 'OUTER3';
+GVL_test.stCase.aOuters[3].nOutersStatus	:= 5;
+// packs 1 data
+GVL_test.stCase.aOuters[3].aPacks[1].sPackCode 	:= 'PACK01OUTER3';
+GVL_test.stCase.aOuters[3].aPacks[1].nPackStatus := 5;
+// packs 2 data
+GVL_test.stCase.aOuters[3].aPacks[2].sPackCode 	:= 'PACK01OUTER1';
+GVL_test.stCase.aOuters[3].aPacks[2].nPackStatus := 5;
+// packs 3 data
+GVL_test.stCase.aOuters[3].aPacks[3].sPackCode 	:= 'PACK02OUTER1';
+GVL_test.stCase.aOuters[3].aPacks[3].nPackStatus := 5;]]></ST>
+      </Implementation>
+    </Action>
+  </POU>
+</TcPlcObject>
