@@ -18,6 +18,9 @@
     <LibraryReferences>{ebe1cb54-1db0-4f0a-895b-c53fe8e647d5}</LibraryReferences>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DUTs\E_TCPIP_RequescCommand.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DUTs\E_TCPIP_SEND_STATE.TcDUT">
       <SubType>Code</SubType>
     </Compile>

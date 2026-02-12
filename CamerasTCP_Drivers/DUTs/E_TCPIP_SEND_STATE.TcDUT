@@ -6,15 +6,12 @@
 {attribute 'to_string'}
 TYPE E_TCPIP_SEND_STATE :
 (
-	IDLE,
-	CONNECT,
+	WAITING,
 	SEND,
 	RECEIVE,
-	DISCONNECT,
 	DONE,
 	CONN_RESET,
-	HEARTBEAT_CHECK,
-	ERROR
+	HEARTBEAT_CHECK
 );
 END_TYPE
 ]]></Declaration>

@@ -7,7 +7,10 @@ VAR_INPUT
 	bEnableSend						: BOOL;
 	strScannerIPAddr				: T_IPv4Addr	:= '192.168.80.130';
 	nReceiveScannerPortNo			: UINT			:= 2010;
-	nSendScannerPortNo				: UINT			:= 4001;
+	nSendScannerPortNo				: UINT			:= 4001;	
+	stRequestCommand				: E_TCPIP_RequescCommand; (* tutaj powinna byc strukruta z eRequestCommand plus parametry: 0,1 etc *)
+	bSendCommand					: BOOL;
+	bExecutedCommandSend			: BOOL;
 END_VAR
 
 VAR_OUTPUT
@@ -25,6 +28,8 @@ VAR
 	strTCPRxString			: T_MaxString;
 	strTCPRxString_Reply	: T_MaxString;
 	ftrigEnable				: F_TRIG;
+	bReInitialiseTCP		: BOOL;
+	fbTON_TcpTimeout		: TON;
 	
 	nIndex					: UINT;
 	nIndex2					: UINT;
@@ -33,19 +38,19 @@ VAR
 	
 	fbTCPSend				: FB_SocketSend;
 	rTrigSend				: R_TRIG;
-	bSendCommand			: BOOL;
+	rTrigSendCommand		: R_TRIG;
 	nCommandNo				: UINT := 1;
-	strTCPCommand			: STRING(20);
-	fbTCPSendDone			: F_TRIG;
+	fTrigTCPSendDone		: F_TRIG;
 	nSendErrId				: UDINT;
+	strTCPCommand			: STRING(20);
+	tHeartbeatInterval		: TIME := T#1S;
+	eRequestCommand			: E_TCPIP_RequescCommand;
 	
 	(* SEND SEQUENCE VARIABLE *)
 	
 	eSendSequenceSTATE		: E_TCPIP_SEND_STATE;
 	bSendRequest			: BOOL;
-	rTrigSendRequest		: R_TRIG;	
-	fTrigTCPSendDone		: F_TRIG;
-	
+	rTrigSendRequest		: R_TRIG;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -75,7 +80,17 @@ fbTCPPortCtrl_Receive(
 	bConnected			=> bReceiveConnected
  );
 	
-]]></ST>
+(* TCP Send Socket establish connect *)
+fbTCPortCtrl_Send(
+	bEnable				:= bEnableSend, 
+	strRemoteIPAddr		:= strScannerIPAddr, 
+	nRemotePortNo		:= nSendScannerPortNo, 
+	tReconnectTime		:= T#20S, 
+	eSocketState		=> eSocketSendState, 
+	bError				=> , 
+	nErrorID			=>, 
+	bConnected			=> bSendConnected
+);]]></ST>
       </Implementation>
     </Action>
     <Action Name="Receive" Id="{708aaa89-8818-4a32-bfe8-6fffb45be551}">
@@ -129,7 +144,7 @@ fbTCPSend(
 );
 
 (* send data complete *)
-fbTCPSendDone(CLK := fbTCPSend.bBusy);
+fTrigTCPSendDone(CLK := fbTCPSend.bBusy);
 (* TCP send complete *)
 
 IF fbTCPSend.bError = TRUE THEN
@@ -138,7 +153,7 @@ ELSE
 	nSendErrId := 0;	
 END_IF
 
-IF fbTCPSendDone.Q = TRUE THEN
+IF fTrigTCPSendDone.Q = TRUE THEN
 
 	(* clear strTCPCommand *)
 	strTCPCommand := '';
@@ -160,90 +175,61 @@ fbTCPReceiveAfterSend(
     <Action Name="Send_Sequence" Id="{fd76404e-ad87-43d3-962c-875000359259}">
       <Implementation>
         <ST><![CDATA[
-CASE eSendSequenceSTATE OF
+rTrigSendCommand(CLK := bSendCommand);
+
+IF rTrigSendCommand.Q  THEN	
+	IF stRequestCommand <> 0 THEN
+		eRequestCommand		:= stRequestCommand;
+	END_IF	
+END_IF
+
+fbTCPSend(
+	sSrvNetId	:= '',
+	hSocket		:= fbTCPortCtrl_Send.hSocket,
+	cbLen		:= TO_UDINT(LEN(strTCPCommand)),
+	pSrc		:= ADR(strTCPCommand),
+	bExecute	:= fbTCPSend.cbLen > 0 AND fbTCPSend.bBusy = FALSE,
+	tTimeout	:= T#1S
+);
 	
-	E_TCPIP_SEND_STATE.IDLE:
-		
-		//if system powerUP, safety and all good then go connect	
-		IF NOT bSendConnected THEN
-			eSendSequenceSTATE := E_TCPIP_SEND_STATE.CONNECT;			
-		END_IF
+	(* send data complete *)
+fTrigTCPSendDone(CLK := fbTCPSend.bBusy);
+IF fTrigTCPSendDone.Q = TRUE THEN
+
+	IF fbTCPSend.bError = TRUE THEN
+		bReInitialiseTCP := TRUE;
+	END_IF
+
+	eRequestCommand := E_TCPIP_RequescCommand.NONE;
+
+	(* close off fbSendTCP *)
+	fbTCPSend(bExecute := FALSE);
+END_IF
+
+
+// HeartBeat send every tHeartbeatInterval, if heartbead doesent reply do bReInitialiseTCP := TRUE
+fbTON_TcpTimeout(
+	IN	:= fbTCPortCtrl_Send.bConnected,
+ 	PT	:= tHeartbeatInterval
+);
+IF fbTON_TcpTimeout.Q THEN
+	eRequestCommand 	:= E_TCPIP_RequescCommand.HeartbeatCheck;	
+	fbTON_TcpTimeout(IN := FALSE);
+END_IF
+//////////////////////////// heartbeat handeling end ///////////////////////////////////////////////
+
+CASE eRequestCommand OF
 	
-	E_TCPIP_SEND_STATE.CONNECT:
-		
-		(* TCP Send Socket establish connect *)
-		fbTCPortCtrl_Send(
-			bEnable				:= bEnableSend, 
-			strRemoteIPAddr		:= strScannerIPAddr, 
-			nRemotePortNo		:= nSendScannerPortNo, 
-			tReconnectTime		:= T#20S, 
-			eSocketState		=> eSocketSendState, 
-			bError				=> , 
-			nErrorID			=>, 
-			bConnected			=> bSendConnected
-		);
-		(* rewrite bSendConnected with heartbeat // check SEND command/Receive answer then bSendConnected=TRUE *)
-		
-		IF bSendConnected AND bSendRequest THEN			
-			eSendSequenceSTATE := E_TCPIP_SEND_STATE.SEND;
-		ELSIF fbTCPortCtrl_Send.bError THEN
-			nSendErrId := 0;
-		END_IF
-	
-	
-	E_TCPIP_SEND_STATE.SEND:
-	
-		rTrigSendRequest(CLK := bSendRequest);
-		fbTCPSend(
-			sSrvNetId	:= '',
-			hSocket		:= fbTCPortCtrl_Send.hSocket,
-			cbLen		:= TO_UDINT(LEN(strTCPCommand)),
-			pSrc		:= ADR(strTCPCommand),
-			bExecute	:= rTrigSendRequest.Q,
-			tTimeout	:= T#1s
-		);
-		
-		(* send data complete *)
-		fTrigTCPSendDone(CLK := fbTCPSend.bBusy);
-		
-		(* TCP send complete *)		
-		IF fTrigTCPSendDone.Q = TRUE THEN
-			(* clear strTCPCommand *)
-			strTCPCommand := '';		
-			(* close off fbSendTCPData *)
-			fbTCPSend(bExecute := FALSE);
-			(*  reset bSendRequest flag *)
-			bSendRequest := FALSE;
-		END_IF
-		
-		eSendSequenceSTATE := E_TCPIP_SEND_STATE.DONE;
-	
-	
-	E_TCPIP_SEND_STATE.RECEIVE:
+	E_TCPIP_RequescCommand.NONE:		
+		strTCPCommand := '';		
 	;
 	
-	// normal state if not sending ??
-	E_TCPIP_SEND_STATE.HEARTBEAT_CHECK:
-	
-		// set bSendRequest every 2s or so tHeartbeatInterwal := T#2s;
-// 		fbRequestStatus(CLK := fbTCPTimeout.ET > T#3.2S);
-// 		IF fbRequestStatus.Q = TRUE AND strTCPCommand = '' THEN			
- 			bSendRequest := TRUE;
-			(* request status from the camera *)
-			strTCPCommand := '<Get,RunMode>'; // create table with all commands, + function to customize command (eg. program no)
-// 		END_IF
-	
-	E_TCPIP_SEND_STATE.DISCONNECT:
+	E_TCPIP_RequescCommand.GetUserCur:		
+		strTCPCommand := '<Get,UserCur>';		
 	;
-	
-	E_TCPIP_SEND_STATE.DONE:
-	;
-	
-	E_TCPIP_SEND_STATE.CONN_RESET:
-	;
-	
-	E_TCPIP_SEND_STATE.ERROR:
-	;
+	E_TCPIP_RequescCommand.HeartbeatCheck:		
+		strTCPCommand 		:= '<Get,RunMode>';		
+	;	
 	
 END_CASE]]></ST>
       </Implementation>
