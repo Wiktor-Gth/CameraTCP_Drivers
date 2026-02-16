@@ -10,7 +10,10 @@ TYPE E_TCPIP_RequescCommand :
 	SetRunMode,				(* Set run mode, 0 - Normal, 1 - Raw, 2 - Test *)
 	SetAcq,					(* Set acquisition mode, 0 - Stop acq, 1 - Start acq *)
 	GetUserCur,
-	HeartbeatCheck			
+	HeartbeatCheck,		
+	SetAquisitonModeON,
+	SetAquisitionModeOFF,
+	WrongReply	
 );
 END_TYPE]]></Declaration>
   </DUT>

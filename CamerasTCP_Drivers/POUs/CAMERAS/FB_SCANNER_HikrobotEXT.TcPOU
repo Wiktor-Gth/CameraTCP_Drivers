@@ -5,7 +5,7 @@
 VAR_INPUT
 	bEnableReceive					: BOOL;
 	bEnableSend						: BOOL;
-	strScannerIPAddr				: T_IPv4Addr	:= '192.168.80.130';
+	strScannerIPAddr				: T_IPv4Addr	:= '192.168.1.45';
 	nReceiveScannerPortNo			: UINT			:= 2010;
 	nSendScannerPortNo				: UINT			:= 4001;	
 	stRequestCommand				: E_TCPIP_RequescCommand; (* tutaj powinna byc strukruta z eRequestCommand plus parametry: 0,1 etc *)
@@ -24,7 +24,9 @@ VAR
 	fbTCPortCtrl_Send		: FB_TCP_ClientPortCtrl;
 	bSendConnected			: BOOL;
 	fbTCPReceive			: FB_ReceiveString;
-	fbTCPReceiveAfterSend	: FB_ReceiveString;
+	bReceiveExpected		: BOOL;
+	fbTCPReceiveAfterSend	: FB_ReceiveString;	
+	strTCPRxStringReply		: T_MaxString;
 	strTCPRxString			: T_MaxString;
 	strTCPRxString_Reply	: T_MaxString;
 	ftrigEnable				: F_TRIG;
@@ -32,18 +34,24 @@ VAR
 	fbTON_TcpTimeout		: TON;
 	
 	nIndex					: UINT;
+	nIndexReply				: UINT;
 	nIndex2					: UINT;
 	
 	/////// send command
 	
 	fbTCPSend				: FB_SocketSend;
 	rTrigSend				: R_TRIG;
+	rTrigDataReceived		: R_TRIG;
 	rTrigSendCommand		: R_TRIG;
 	nCommandNo				: UINT := 1;
 	fTrigTCPSendDone		: F_TRIG;
 	nSendErrId				: UDINT;
 	strTCPCommand			: STRING(20);
-	tHeartbeatInterval		: TIME := T#1S;
+	strReplyString			: STRING(20);
+	strTCPLastCommand		: STRING(20);
+	strLastReplyString		: STRING(20);
+	bReplyOK				: BOOL;
+	tHeartbeatInterval		: TIME := T#5S;
 	eRequestCommand			: E_TCPIP_RequescCommand;
 	
 	(* SEND SEQUENCE VARIABLE *)
@@ -123,6 +131,14 @@ IF nIndex = 20 THEN
 		GVL.aTCPxStrings[nIndex2] := '';		
 	END_FOR
 END_IF
+
+IF nIndexReply = 20 THEN
+	nIndexReply := 0;
+	FOR nIndex2 := 0 TO 20 DO
+		GVL.aTCPxStringsReply[nIndex2] := '';		
+	END_FOR
+END_IF
+
 //*************** quick patch ****************//]]></ST>
       </Implementation>
     </Action>
@@ -179,7 +195,7 @@ rTrigSendCommand(CLK := bSendCommand);
 
 IF rTrigSendCommand.Q  THEN	
 	IF stRequestCommand <> 0 THEN
-		eRequestCommand		:= stRequestCommand;
+		eRequestCommand	:= stRequestCommand;
 	END_IF	
 END_IF
 
@@ -200,19 +216,47 @@ IF fTrigTCPSendDone.Q = TRUE THEN
 		bReInitialiseTCP := TRUE;
 	END_IF
 
-	eRequestCommand := E_TCPIP_RequescCommand.NONE;
-
+	strTCPLastCommand 	:= strTCPCommand;
+	strLastReplyString	:= strReplyString;
+	eRequestCommand 	:= E_TCPIP_RequescCommand.NONE;
 	(* close off fbSendTCP *)
-	fbTCPSend(bExecute := FALSE);
+	fbTCPSend(bExecute 	:= FALSE);
+	
+	(* expece to receive reply after send finished *)
+	bReceiveExpected	:= TRUE;
+	
 END_IF
 
+fbTCPReceiveAfterSend(
+	bEnable			:= fbTCPortCtrl_Send.bConnected,
+	hSocket			:= fbTCPortCtrl_Send.hSocket,
+	tUpdateTime		:= T#100MS,
+	strTCPRxString	:= strTCPRxStringReply
+);
+
+rTrigDataReceived(CLK:=fbTCPReceiveAfterSend.bDataReceived);
+IF rTrigDataReceived.Q THEN
+	(*  veryfi valide response *)
+	
+	IF strLastReplyString = strTCPRxStringReply THEN
+		bReplyOK := TRUE;
+	ELSE		
+		bReplyOK := FALSE;			
+	END_IF
+	
+	GVL.aTCPxStringsReply[nIndexreply] 	:= strTCPRxStringReply;
+	nIndexReply	 						:= nIndexReply + 1;
+	strTCPRxStringReply 				:= '';
+	bReceiveExpected					:= FALSE;
+	
+END_IF
 
 // HeartBeat send every tHeartbeatInterval, if heartbead doesent reply do bReInitialiseTCP := TRUE
 fbTON_TcpTimeout(
 	IN	:= fbTCPortCtrl_Send.bConnected,
  	PT	:= tHeartbeatInterval
 );
-IF fbTON_TcpTimeout.Q THEN
+IF fbTON_TcpTimeout.Q AND (eRequestCommand = E_TCPIP_RequescCommand.NONE) THEN
 	eRequestCommand 	:= E_TCPIP_RequescCommand.HeartbeatCheck;	
 	fbTON_TcpTimeout(IN := FALSE);
 END_IF
@@ -221,15 +265,28 @@ END_IF
 CASE eRequestCommand OF
 	
 	E_TCPIP_RequescCommand.NONE:		
-		strTCPCommand := '';		
-	;
+		strTCPCommand 	:= '';	
+		strReplyString	:= '';		
 	
 	E_TCPIP_RequescCommand.GetUserCur:		
-		strTCPCommand := '<Get,UserCur>';		
-	;
+		strTCPCommand 	:= '<Get,UserCur>';	
+		strReplyString	:= '<Get,UserCur,6>';	
+		
+	E_TCPIP_RequescCommand.WrongReply:		
+		strTCPCommand 	:= '<Get,UserCur>';	
+		strReplyString	:= '<Get,UserCur,2>';
+	
 	E_TCPIP_RequescCommand.HeartbeatCheck:		
-		strTCPCommand 		:= '<Get,RunMode>';		
-	;	
+		strTCPCommand 	:= '<Get,RunMode>';	
+		strReplyString	:= '<Get,RunMode,0>';		
+		
+	E_TCPIP_RequescCommand.SetAquisitonModeON:
+		strTCPCommand 	:= '<Set,Acq,1>';	
+		strReplyString	:= '<Set,Acq,OK>';	
+		
+	E_TCPIP_RequescCommand.SetAquisitionModeOFF:
+		strTCPCommand 	:= '<Set,Acq,0>';	
+		strReplyString	:= '<Set,Acq,OK>';
 	
 END_CASE]]></ST>
       </Implementation>

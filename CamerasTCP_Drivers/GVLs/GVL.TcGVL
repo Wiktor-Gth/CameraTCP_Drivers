@@ -24,6 +24,7 @@ VAR_GLOBAL
 
 
 	aTCPxStrings						: ARRAY[0..20] OF T_MaxString;
+	aTCPxStringsReply					: ARRAY[0..20] OF T_MaxString;
 
 END_VAR]]></Declaration>
   </GVL>

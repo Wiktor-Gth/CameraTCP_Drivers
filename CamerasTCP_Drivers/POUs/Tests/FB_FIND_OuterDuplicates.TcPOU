@@ -11,8 +11,8 @@ VAR_OUTPUT
 END_VAR
 VAR
 	nOuterIndex			: UINT;
-	nMax_Outers			: UINT := 3;
-	nMax_Packs			: UINT := 3;
+	nMax_Outers			: UINT := 50;
+	nMax_Packs			: UINT := 10;
 	nInnerOuterIndex	: UINT;
 	nInnerPackIndex		: UINT;
 	nPackIndex			: UINT;
