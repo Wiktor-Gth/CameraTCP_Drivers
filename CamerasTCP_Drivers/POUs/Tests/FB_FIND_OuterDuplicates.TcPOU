@@ -16,8 +16,10 @@ VAR
 	nInnerOuterIndex	: UINT;
 	nInnerPackIndex		: UINT;
 	nPackIndex			: UINT;
+	sCurrentOuterCode	: T_MaxString;
 	sCurrentPackCode	: T_MaxString;	
 	bIsDuplicate 		: BOOL;
+	bISOuterDuplicate	: BOOL;
 END_VAR
 VAR_IN_OUT	
 	stCase				: ST_LAB_CaseData;
@@ -31,11 +33,19 @@ nDuplicateCount := 0;
 	
 	(* Loop throught all packs in one case 'stCase' *)
 	FOR nOuterIndex := 1 TO nMax_Outers DO
+		sCurrentOuterCode := stCase.aOuters[nOuterIndex].sOuterCode;
 		FOR nPackIndex := 1 TO nMax_Packs DO
 			sCurrentPackCode := stCase.aOuters[nOuterIndex].aPacks[nPackIndex].sPackCode;
 			bIsDuplicate := FALSE;			
 			(* Looking for same pack codes in all outers *)
 			FOR nInnerOuterIndex := nOuterIndex TO nMax_Outers DO
+				IF nInnerOuterIndex < 50 THEN					
+					IF (sCurrentOuterCode = stCase.aOuters[nInnerOuterIndex + 1].sOuterCode) THEN
+						bIsOuterDuplicate									:= TRUE;													
+						stCase.aOuters[nOuterIndex].nOuterRejectID			:= 200;					
+						stCase.aOuters[nInnerOuterIndex + 1].nOuterRejectID	:= 200;
+					END_IF	
+				END_IF
 				FOR nInnerPackIndex := 1 TO nMax_Packs DO
 					nIterationCount	:= nIterationCount + 1;					
 					(* Exclude comparing same pack with itself *)
