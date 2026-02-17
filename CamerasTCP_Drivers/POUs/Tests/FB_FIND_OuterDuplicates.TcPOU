@@ -39,7 +39,7 @@ nDuplicateCount := 0;
 				FOR nInnerPackIndex := 1 TO nMax_Packs DO
 					nIterationCount	:= nIterationCount + 1;					
 					(* Exclude comparing same pack with itself *)
-					IF (nInnerOuterIndex <> nOuterIndex) AND (nInnerPackIndex <> nPackIndex) THEN
+					IF NOT ((nInnerOuterIndex = nOuterIndex) AND (nInnerPackIndex = nPackIndex)) THEN
 						IF sCurrentPackCode = stCase.aOuters[nInnerOuterIndex].aPacks[nInnerPackIndex].sPackCode THEN
 							bIsDuplicate := TRUE;
 							nDuplicateCount := nDuplicateCount + 1;
