@@ -9,12 +9,12 @@ VAR_IN_OUT
 
 	stProductInstruction				: ST_PCM_Status;
 	
-	stPackCodesDuplicated			: ST_RejectItems;
-	stOuterBarcodeDuplicate			: ST_RejectItems;
-	stOuterDuplicatedPackCodesFound	: ST_RejectItems;
-	stCaseRejectReasons			: ST_RejectReasonsForCase;
+	stPackCodesDuplicated				: ST_RejectItems;
+	stOuterBarcodeDuplicate				: ST_RejectItems;
+	stOuterDuplicatedPackCodesFound		: ST_RejectItems;
+	stCaseRejectReasons					: ST_RejectReasonsForCase;
 	
-	stCACData 						: ST_CAC_Data;
+	stCACData 							: ST_CAC_Data;
 END_VAR
 VAR_OUTPUT
 	bDone 					: BOOL;

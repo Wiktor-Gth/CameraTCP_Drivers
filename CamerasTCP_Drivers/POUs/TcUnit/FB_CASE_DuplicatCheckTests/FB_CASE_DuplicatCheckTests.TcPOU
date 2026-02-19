@@ -4,7 +4,17 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_CASE_DuplicatCheckTests EXTENDS TcUnit.FB_TestSuite
 
 VAR
-	fbCase		: FB_CASE_ValidateContent;	
+	
+	(* In/Out test 01*)
+	stProductInstruction_01					: ST_PCM_Status;
+	stPackCodesDuplicated_01				: ST_RejectItems;
+	stOuterBarcodeDuplicate_01				: ST_RejectItems;
+	stOuterDuplicatedPackCodesFound_01		: ST_RejectItems;
+	stCaseRejectReasons_01					: ST_RejectReasonsForCase;		
+	stUpdateCACData_01						: ST_CAC_Data;
+	
+	stCACData_01 							: ST_CAC_Data;
+	
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -12,38 +22,108 @@ END_VAR
 //MAIN TESTS
 //==============================================================
 
-test01_();]]></ST>
+main01_bIsDuplicateOuterTRUEonOuterBarcodeDuplicate();]]></ST>
     </Implementation>
-    <Method Name="test01_" Id="{28fac7c7-7d19-486e-8e1b-26c6556d78e2}">
-      <Declaration><![CDATA[METHOD INTERNAL test01_
+    <Folder Name="Main" Id="{90804e8b-9724-4b91-a81d-e1b2ab2e1846}" />
+    <Method Name="main01_bIsDuplicateOuterTRUEonOuterBarcodeDuplicate" Id="{da094c5b-b96c-4f61-928e-83b515b4b561}" FolderPath="Main\">
+      <Declaration><![CDATA[METHOD INTERNAL main01_bIsDuplicateOuterTRUEonOuterBarcodeDuplicate
 VAR
-	fbCase		: FB_CASE_DuplicatCheck;	
+	fbCase					: FB_CASE_DuplicatCheck;
+	bIsDuplicateOuter		: BOOL;
+	bIsDuplicatePacks		: BOOL;
+	
+
+	
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[TcUnit.TEST('test01_');
+        <ST><![CDATA[
+//Data initialization
+TestInit(stCACData:= stCACData_01, stProductInstruction:= stProductInstruction_01);
 
+//Change some data for test scenario below
+stCACData_01.Outer[9].Barcode := stCACData_01.Outer[15].Barcode;
 
+	
+TcUnit.TEST('main01_bIsDuplicateOuterTRUEonOuterBarcodeDuplicate');
 
 fbCase(
-	bExecute:= , 
-	stProductInstruction:= , 
-	stPackCodesDuplicated:= , 
-	stOuterBarcodeDuplicate:= , 
-	stOuterDuplicatedPackCodesFound:= , 
-	stCaseRejectReasons:= , 
-	stCACData:= , 
+	bExecute:= TRUE, 
+	stProductInstruction:= stProductInstruction_01, 
+	stPackCodesDuplicated:= stPackCodesDuplicated_01, 
+	stOuterBarcodeDuplicate:= stOuterBarcodeDuplicate_01, 
+	stOuterDuplicatedPackCodesFound:= stOuterDuplicatedPackCodesFound_01, 
+	stCaseRejectReasons:= stCaseRejectReasons_01, 
+	stCACData:= stCACData_01, 
 	bDone=> , 
 	bBusy=> , 
 	bCACValid=> , 
 	sRejectCode=> , 
-	bIsDuplicateOuters=> , 
-	bIsDuplicatePacks=> , 
+	bIsDuplicateOuters=> bIsDuplicateOuter, 
+	bIsDuplicatePacks=> bIsDuplicatePacks, 
 	bReadyToValidate=> , 
-	stUpdateCACData=> 
+	stUpdateCACData=> stUpdateCACData_01
 );
 
+	
+AssertEquals_BOOL( Expected	:= TRUE,
+			 	   Actual	:= bIsDuplicateOuter, 
+			 	   Message	:= 'Duplicated Outer barcode not found');
+						
+
 TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="TestInit" Id="{52554f64-7b81-4605-b395-1bdb3c9881b5}">
+      <Declaration><![CDATA[METHOD PRIVATE TestInit
+VAR_IN_OUT
+	stProductInstruction	: ST_PCM_Status;
+	stCACData 				: ST_CAC_Data;
+END_VAR
+
+VAR	
+	rTrigDataInit		: R_TRIG;
+	bDataInit			: BOOL;
+	iOuter				: INT;
+	iPack				: INT;
+	sPackNum			: STRING;
+	sOuterNum			: STRING;
+	sPackCode			: STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+stProductInstruction.nOutersPerCase		:= 50;
+stProductInstruction.nPacksPerOuter 	:= 10;
+
+	FOR iOuter := 1 TO stProductInstruction.nOutersPerCase DO
+		(* Ustaw outer *)
+		stCACData.Outer[iOuter].Barcode    := CONCAT('OUTER', INT_TO_STRING(iOuter));
+		stCACData.Outer[iOuter].OuterCodeStatus := 5;
+		
+		FOR iPack := 1 TO stProductInstruction.nPacksPerOuter DO
+			(* Pack number z zerami *)
+			sPackNum := CONCAT('0', INT_TO_STRING(iPack));  (* dla 1-9: '01'-'09' *)
+			IF iPack = 10 THEN
+				sPackNum := '10';
+			END_IF;
+			
+			(* Outer number z zerami dla 1-9 *)
+			sOuterNum := CONCAT('0', INT_TO_STRING(iOuter));
+			IF iOuter >= 10 THEN
+				sOuterNum := INT_TO_STRING(iOuter);
+			END_IF;
+			
+			(* Sklej pack code *)
+			sPackCode := CONCAT(CONCAT('PACK', sPackNum), CONCAT('OUTER', sOuterNum));
+			
+			(* Przypisz *)
+			stCACData.Outer[iOuter].PackCode[iPack]			:= sPackCode;
+			stCACData.Outer[iOuter].PackCodeStatus[iPack]	:= 5;
+			stCACData.Outer[iOuter].PackRejectID[iPack]		:= 0;
+			
+		END_FOR;
+	END_FOR;	
+]]></ST>
       </Implementation>
     </Method>
   </POU>

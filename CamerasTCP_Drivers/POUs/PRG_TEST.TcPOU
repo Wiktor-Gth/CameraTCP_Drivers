@@ -3,7 +3,8 @@
   <POU Name="PRG_TEST" Id="{57de771e-4346-4079-9379-3645d39749ca}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM PRG_TEST
 VAR
-	fbInitialiseData_Test 	: FB_CASE_InitialiseDataTests;
+	fbCaseInitialiseData_Test 	: FB_CASE_InitialiseDataTests;
+	fbCaseDuplicatCheck_Test	: FB_CASE_DuplicatCheckTests;
 	
 END_VAR
 ]]></Declaration>
@@ -16,7 +17,8 @@ TcUnit.RUN();
 //===================================================
 //MANUAL TEST EXECUTION
 
-PRG_CASE_InitialiseDataManual();]]></ST>
+PRG_CASE_InitialiseDataManual();
+PRG_CASE_DuplicatCheckManual();]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>
