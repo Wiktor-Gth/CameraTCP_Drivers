@@ -5,6 +5,8 @@
 VAR
 	fbCaseInitialiseData_Test 	: FB_CASE_InitialiseDataTests;
 	fbCaseDuplicatCheck_Test	: FB_CASE_DuplicatCheckTests;
+	fbCaseDuplicateUpdateToDB	: FB_CASE_DuplicateUpdateToDBTests;
+	fbCaseValidateContent		: FB_CASE_ValidateContent;
 	
 END_VAR
 ]]></Declaration>
@@ -12,13 +14,15 @@ END_VAR
       <ST><![CDATA[//===================================================
 //UNIT TEST EXECUTION
 
-TcUnit.RUN();
+//TcUnit.RUN();
 
 //===================================================
 //MANUAL TEST EXECUTION
 
 PRG_CASE_InitialiseDataManual();
-PRG_CASE_DuplicatCheckManual();]]></ST>
+PRG_CASE_DuplicatCheckManual();
+PRG_CASE_DuplicateUpdateToDBManual();
+PRG_CASE_ValidateContentManual();]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>

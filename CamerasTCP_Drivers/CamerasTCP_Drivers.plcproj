@@ -1151,6 +1151,10 @@
     <Compile Include="DUTs\Test_DUTs\ST_LAB_PackData.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GVLs\CodeAI.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
     <Compile Include="GVLs\gConstants.TcGVL">
       <SubType>Code</SubType>
     </Compile>
@@ -1193,6 +1197,9 @@
     <Compile Include="POUs\TcUnit\FB_CASE_DuplicatCheckTests\PRG_CASE_DuplicatCheckManual.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\TcUnit\FB_CASE_DuplicateUpdateToDBTests\PRG_CASE_DuplicateUpdateToDBManual.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\TcUnit\FB_CASE_ValidateContentTests\FB_CASE_ValidateContentTests.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -1212,9 +1219,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\TcUnit\FB_CASE_DuplicateUpdateToDBTests\FB_CASE_DuplicateUpdateToDBTests.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TcUnit\FB_CASE_DuplicateUpdateToDBTests\PRG_CASE_DuplicateUpdateToDBManual.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\_Utilites\Addtionals\FB_PulseGenerator_Sync.TcPOU">
@@ -1250,13 +1254,34 @@
     <Compile Include="POUs\_Utilites\METS\Concat Function\F_CONCAT9.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\_Utilites\METS\FB_CODE_ValidateExplicitCode.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\_Utilites\METS\FB_ExtractString.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\_Utilites\METS\F_CASE_GetSKUFromHex.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\_Utilites\METS\F_CodeToHex.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\_Utilites\METS\F_CODE_AssignValToStringWithPrefix.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\_Utilites\METS\F_CODE_BATSerializator.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\_Utilites\METS\F_CODE_GetItem.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\_Utilites\METS\F_FiltredSetBitState16.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\_Utilites\METS\F_InvalidateASCIIChar.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\_Utilites\METS\F_ReplaceSingleChar.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\_Utilites\METS\F_StringAddPrefix.TcPOU">
@@ -1265,7 +1290,13 @@
     <Compile Include="POUs\_Utilites\METS\F_StringWildcard.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\_Utilites\METS\F_SYSTEM_SystemTimeAsISO8601.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\_Utilites\METS\F_SYSTEM_SystemTimeOffsetToHHMM.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\_Utilites\METS\F_ZeroPadString.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\_Utilites\TCP_FB\FB_ReceiveString.TcPOU">
