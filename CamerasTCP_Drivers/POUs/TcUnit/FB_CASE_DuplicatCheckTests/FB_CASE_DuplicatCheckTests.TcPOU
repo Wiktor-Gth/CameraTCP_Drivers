@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_CASE_DuplicatCheckTests" Id="{48ce7775-a9a4-40d8-ace0-2620e784a3e8}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_CASE_DuplicatCheckTests EXTENDS TcUnit.FB_TestSuite
+
+VAR
+	fbCase		: FB_CASE_ValidateContent;	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//==============================================================
+//MAIN TESTS
+//==============================================================
+
+test01_();]]></ST>
+    </Implementation>
+    <Method Name="test01_" Id="{28fac7c7-7d19-486e-8e1b-26c6556d78e2}">
+      <Declaration><![CDATA[METHOD INTERNAL test01_
+VAR
+	fbCase		: FB_CASE_DuplicatCheck;	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TcUnit.TEST('test01_');
+
+
+
+fbCase(
+	bExecute:= , 
+	stProductInstruction:= , 
+	stPackCodesDuplicated:= , 
+	stOuterBarcodeDuplicate:= , 
+	stOuterDuplicatedPackCodesFound:= , 
+	stCaseRejectReasons:= , 
+	stCACData:= , 
+	bDone=> , 
+	bBusy=> , 
+	bCACValid=> , 
+	sRejectCode=> , 
+	bIsDuplicateOuters=> , 
+	bIsDuplicatePacks=> , 
+	bReadyToValidate=> , 
+	stUpdateCACData=> 
+);
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

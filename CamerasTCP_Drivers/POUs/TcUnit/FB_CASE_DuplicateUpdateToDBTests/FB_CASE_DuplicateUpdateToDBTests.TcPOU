@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_CASE_DuplicateUpdateToDBTests" Id="{3857eac7-9641-4b1d-9981-1db0e153c9f7}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_CASE_DuplicateUpdateToDBTests EXTENDS TcUnit.FB_TestSuite
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//==============================================================
+//MAIN TESTS
+//==============================================================
+
+test01_();]]></ST>
+    </Implementation>
+    <Method Name="test01_" Id="{cd0bd6a3-fa13-45a2-8424-d8bddeeb9488}">
+      <Declaration><![CDATA[METHOD INTERNAL test01_
+VAR
+	fbCase		: FB_CASE_DuplicateUpdateToDB;	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TcUnit.TEST('test01_');
+
+fbCase(
+	bExecute:= , 
+	bUseInterimCodeForValidation:= , 
+	aOCVPackStatus:= , 
+	aOuterStatus:= , 
+	stOCVDataDB:= , 
+	stOACDataDB:= , 
+	stOuterBarcodeDuplicate:= , 
+	stOuterDuplicatedPackCodesFound:= , 
+	stCodeInfo_Pack:= , 
+	stCodeInfo_Intermediate:= , 
+	stCodeInfo_Outer:= , 
+	stCACData:= , 
+	bDone=> , 
+	bBusy=> , 
+	bError=> , 
+	nErrorID=> , 
+	nOACFilesBlocked=> , 
+	nOCVFilesBlocked=> , 
+	stDaigOACDataDB=> , 
+	stDiagOCVDataDB=> );
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

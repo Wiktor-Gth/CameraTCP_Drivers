@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_CASE_InitialiseDataTests" Id="{18f97de6-ed76-44ae-ba5e-7b2d44347ddb}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_CASE_InitialiseDataTests EXTENDS TcUnit.FB_TestSuite
+
+VAR
+	
+	
+	(* In/Out test 01*)
+	stProductInstruction_main01		: ST_PCM_Status;
+	stCACData_main01 				: ST_CAC_Data;	(* Case Queue *)
+	
+	(* In/Out test 02*)
+	stProductInstruction_main02		: ST_PCM_Status;
+	stCACData_main02 				: ST_CAC_Data;	(* Case Queue *)
+	
+	(* In/Out test 03*)
+	stProductInstruction_main03		: ST_PCM_Status;
+	stCACData_main03 				: ST_CAC_Data;	(* Case Queue *)	
+	stDoorGuardReject_main03		: ST_RejectItems;
+	
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//==============================================================
+//MAIN TESTS
+//==============================================================
+
+main01_OuterCodeStatus5_NegativeNumberOfOuters();
+main02_MasterListRestoredCounterWrongNumber();
+main03_DoorRejectIDstatusValueTrue();]]></ST>
+    </Implementation>
+    <Folder Name="Main" Id="{eca26ad4-16d4-4352-be9e-83f84f9e1ce9}" />
+    <Method Name="main01_OuterCodeStatus5_NegativeNumberOfOuters" Id="{ba6b24d7-e296-48d0-9ff5-85c414b06a2f}" FolderPath="Main\">
+      <Declaration><![CDATA[METHOD INTERNAL main01_OuterCodeStatus5_NegativeNumberOfOuters
+VAR
+	fbCase					: FB_CASE_InitialiseData;	
+	
+	nMasterListCounter		: INT;	
+
+	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TestInit(stProductInstruction_main01,stCACData_main01);
+
+stCACData_main01.Outer[3].OuterCodeStatus.5 	:= TRUE;
+stCACData_main01.Outer[4].OuterCodeStatus.5		:= TRUE;
+	
+TcUnit.TEST('main01_OuterCodeStatus5_NegativeNumberOfOuters');
+
+fbCase(
+	bExecute:= TRUE, 
+	stCTDateTime:= , 
+	stDoorGuardReject:= , 
+	stProductInstruction:= stProductInstruction_main01, 
+	stCACData:= stCACData_main01, 
+	bDone=> , 
+	bBusy=> , 
+	bDoorReject=> , 
+	sRejectCode=> , 
+	nMasterListCounter=> nMasterListCounter, 
+	bCheckDuplicates=> 
+);
+
+	AssertEquals_INT(	Expected:= -3, 
+						Actual:= stCACData_main01.NumberOfOuters, 
+						Message:= 'Wrong NumberOfOuters parameter (Val Index)');
+						
+						
+
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="main02_MasterListRestoredCounterWrongNumber" Id="{a2656953-2dd5-4223-975e-2931b3a700ff}" FolderPath="Main\">
+      <Declaration><![CDATA[METHOD INTERNAL main02_MasterListRestoredCounterWrongNumber
+VAR
+	fbCase					: FB_CASE_InitialiseData;	
+	
+	nMasterListCounter		: INT;	
+
+	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TestInit(stProductInstruction_main02,stCACData_main02);
+	
+stCACData_main02.Outer[1].OuterMasterListRestored	:= TRUE;
+stCACData_main02.Outer[25].OuterMasterListRestored	:= TRUE;
+stCACData_main02.Outer[49].OuterMasterListRestored	:= TRUE;
+//outers in case 50, table size 70
+stCACData_main02.Outer[67].OuterMasterListRestored	:= TRUE;
+
+TcUnit.TEST('main02_MasterListRestoredCounterWrongNumber');
+
+fbCase(
+	bExecute:= TRUE, 
+	stCTDateTime:= , 
+	stDoorGuardReject:= , 
+	stProductInstruction:= stProductInstruction_main02, 
+	stCACData:= stCACData_main02, 
+	bDone=> , 
+	bBusy=> , 
+	bDoorReject=> , 
+	sRejectCode=> , 
+	nMasterListCounter=> nMasterListCounter, 
+	bCheckDuplicates=> 
+);
+
+	AssertEquals_INT(	Expected:= 3, 
+						Actual:= nMasterListCounter, 
+						Message:= 'Wrong count of restored outer');
+						
+	AssertEquals_BOOL(	Expected := TRUE, 
+						Actual:= stCACData_main02.Outer[49].OuterMasterListRestored, 
+						Message:= 'Outer master list restored status wrong value');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="main03_DoorRejectIDstatusValueTrue" Id="{58786511-1969-4dd6-baa1-bcc0df4c3293}" FolderPath="Main\">
+      <Declaration><![CDATA[METHOD INTERNAL main03_DoorRejectIDstatusValueTrue
+VAR
+	fbCase					: FB_CASE_InitialiseData;	
+	
+	nMasterListCounter		: INT;	
+	bDoorReject				: BOOL;	
+	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TestInit(stProductInstruction_main03,stCACData_main03);
+
+stDoorGuardReject_main03.nRejectID := 311;
+stCACData_main03.CaseRejectID := 311;
+(* PassThrough, PrePrintedLabel or PrintApply mode active *)
+stProductInstruction_main03.nOpMode := 6;
+
+TcUnit.TEST('main03_DoorRejectIDstatusValueTrue');
+
+fbCase(
+	bExecute:= TRUE, 
+	stCTDateTime:= , 
+	stDoorGuardReject:= stDoorGuardReject_main03, 
+	stProductInstruction:= stProductInstruction_main03, 
+	stCACData:= stCACData_main03, 
+	bDone=> , 
+	bBusy=> , 
+	bDoorReject=> bDoorReject, 
+	sRejectCode=> , 
+	nMasterListCounter=> nMasterListCounter, 
+	bCheckDuplicates=> 
+);
+						
+	AssertEquals_BOOL(	Expected := TRUE, 
+						Actual:= bDoorReject, 
+						Message:= 'Case reject ID wrong value');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="TestInit" Id="{4eb8a079-32fd-4185-b10b-fa0b793458cd}">
+      <Declaration><![CDATA[METHOD PRIVATE TestInit
+VAR_IN_OUT
+	stProductInstruction	: ST_PCM_Status;
+	stCACData 				: ST_CAC_Data;	(* Case Queue *)
+END_VAR
+
+VAR	
+	nOuterIndex				: INT;
+	nPackIndex				: INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[MEMSET(ADR(stCACData), 16#00, SIZEOF(stCACData));	
+
+stProductInstruction.nOutersPerCase 	:= 50;
+stProductInstruction.nPacksPerOuter		:= 10;
+stProductInstruction.nOpMode			:= 11;
+stProductInstruction.sRetailSKU			:= '1234567';
+stProductInstruction.nAcceptanceLevel 	:= 10;
+
+
+stCACData.NumberOfOuters			:= stProductInstruction.nOutersPerCase;
+stCACData.CodingAndTrackingMode		:= stProductInstruction.nOpMode;
+stCACData.RetailSKU					:= stProductInstruction.sRetailSKU;
+
+FOR nOuterIndex := 1 TO stProductInstruction.nOutersPerCase BY 1 DO
+
+stCACData.Outer[nOuterIndex].Barcode 					:= CONCAT('OUTER_', INT_TO_STRING(nOuterIndex));
+stCACData.Outer[nOuterIndex].NumberOfPacks 				:= stProductInstruction.nPacksPerOuter;
+stCACData.Outer[nOuterIndex].NumberOfLinkedPacks 		:= stProductInstruction.nPacksPerOuter;
+stCACData.Outer[nOuterIndex].AcceptanceLevel 			:= stProductInstruction.nAcceptanceLevel;
+stCACData.Outer[nOuterIndex].CodingAndTrackingMode		:= stProductInstruction.nOpMode;
+stCACData.Outer[nOuterIndex].OuterRejectCode			:= 'OK';
+
+	FOR  nPackIndex :=1 TO stProductInstruction.nPacksPerOuter BY 1 DO
+		stCACData.Outer[nOuterIndex].PackCode[nPackIndex] 		:= F_CONCAT3(stCACData.Outer[nOuterIndex].Barcode,'_PACK_', INT_TO_STRING(nPackIndex));
+		IF nPackIndex = 1 THEN
+			stCACData.Outer[nOuterIndex].AggregationCodes[1]	:= stCACData.Outer[nOuterIndex].PackCode[nPackIndex];
+		END_IF
+		IF nPackIndex = 2 THEN
+			stCACData.Outer[nOuterIndex].AggregationCodes[2]	:= stCACData.Outer[nOuterIndex].PackCode[nPackIndex];
+		END_IF
+		stCACData.Outer[nOuterIndex].PackCodeStatus[nPackIndex].5 	:= TRUE;
+		stCACData.Outer[nOuterIndex].PackRejectCode[nPackIndex]		:= 'OK';
+	END_FOR
+END_FOR	
+]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

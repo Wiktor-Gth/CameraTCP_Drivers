@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_CASE_ValidateContentTests" Id="{822c9689-f495-489e-84c7-63cbf678b11e}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_CASE_ValidateContentTests EXTENDS TcUnit.FB_TestSuite
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//==============================================================
+//MAIN TESTS
+//==============================================================
+
+test01_();]]></ST>
+    </Implementation>
+    <Method Name="test01_" Id="{26123643-35d9-4d6c-90cd-d16e12ac309d}">
+      <Declaration><![CDATA[METHOD INTERNAL test01_
+VAR
+	fbCase		: FB_CASE_ValidateContent;	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TcUnit.TEST('test01_');
+
+fbCase(
+	bExecute:= , 
+	stCTDateTime:= , 
+	stProductInstruction:= , 
+	nSecquentionalCounter:= , 
+	stCodeInfo_Outer:= , 
+	stCaseRejectReasons:= , 
+	stCACData:= , 
+	bDone=> , 
+	bBusy=> , 
+	bError=> , 
+	nErrorID=> , 
+	sRejectCode=> , 
+	nValidationIndex=> );
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
