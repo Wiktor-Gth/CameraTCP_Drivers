@@ -151,7 +151,7 @@ IF rtExecute.Q THEN
 			
 			IF stCACData.Outer[nOuterIndex].Barcode = stCACData.Outer[nOuterCheckIndex].Barcode AND 
 				stCACData.Outer[nOuterIndex].Barcode <> ''	THEN
-				 
+	
 			 	IF NOT bIsDuplicateOuters THEN
 					nDuplicateOuter1_Position := nOuterIndex;
 					nDuplicateOuter2_Position := nOuterCheckIndex;

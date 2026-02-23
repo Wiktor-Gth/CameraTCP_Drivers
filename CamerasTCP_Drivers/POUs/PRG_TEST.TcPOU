@@ -4,10 +4,10 @@
     <Declaration><![CDATA[PROGRAM PRG_TEST
 VAR
 	fbCaseDuplicatCheck_Test		: FB_CASE_DuplicatCheckTests;
-	fbCaseDuplicateUpdateToDB		: FB_CASE_DuplicateUpdateToDBTests;
-	fbCaseFinaliseData				: FB_CASE_FinaliseDataTests;
-	fbCaseInitialiseData_Test 		: FB_CASE_InitialiseDataTests;
-	fbCaseValidateContent			: FB_CASE_ValidateContentTests;
+	//fbCaseDuplicateUpdateToDB		: FB_CASE_DuplicateUpdateToDBTests;
+	//fbCaseFinaliseData				: FB_CASE_FinaliseDataTests;
+	//fbCaseInitialiseData_Test 		: FB_CASE_InitialiseDataTests;
+	//fbCaseValidateContent			: FB_CASE_ValidateContentTests;
 	
 END_VAR
 ]]></Declaration>
@@ -15,7 +15,7 @@ END_VAR
       <ST><![CDATA[//===================================================
 //UNIT TEST EXECUTION
 
-//TcUnit.RUN();
+TcUnit.RUN();
 
 //===================================================
 //MANUAL TEST EXECUTION

@@ -19,7 +19,6 @@ VAR
 	
 	(* In/Out *)
 	stProductInstruction				: ST_PCM_Status;
-	stPackCodesDuplicated				: ST_RejectItems;
 	stOuterBarcodeDuplicate				: ST_RejectItems;
 	stOuterDuplicatedPackCodesFound		: ST_RejectItems;
 	stCaseRejectReasons					: ST_RejectReasonsForCase;
@@ -404,7 +403,7 @@ END_VAR
                           <o>
                             <o n="Operand" t="Operand">
                               <v n="Operand">"stCACData"</v>
-                              <v n="Type">"ST_CAC_Data[REF]"</v>
+                              <v n="Type">"ST_CAC_Data"</v>
                               <v n="Comment">""</v>
                               <v n="SymbolComment">""</v>
                               <v n="Address">""</v>
@@ -512,27 +511,20 @@ stProductInstruction.nOutersPerCase		:= 50;
 stProductInstruction.nPacksPerOuter 	:= 10;
 
 	FOR iOuter := 1 TO stProductInstruction.nOutersPerCase DO
-		(* Ustaw outer *)
-		stCACData.Outer[iOuter].Barcode    := CONCAT('OUTER', INT_TO_STRING(iOuter));
+		(* Outer number z zerami *)
+		sOuterNum := F_StringAddPrefix(INT_TO_STRING(iOuter),2,'0');
+		
+		(* Write Outers barcodes *)
+		stCACData.Outer[iOuter].Barcode    := CONCAT('OUTER', sOuterNum);
 		stCACData.Outer[iOuter].OuterCodeStatus := 5;
 		
 		FOR iPack := 1 TO stProductInstruction.nPacksPerOuter DO
-			(* Pack number z zerami *)
-			sPackNum := CONCAT('0', INT_TO_STRING(iPack));  (* dla 1-9: '01'-'09' *)
-			IF iPack = 10 THEN
-				sPackNum := '10';
-			END_IF;
-			
-			(* Outer number z zerami dla 1-9 *)
-			sOuterNum := CONCAT('0', INT_TO_STRING(iOuter));
-			IF iOuter >= 10 THEN
-				sOuterNum := INT_TO_STRING(iOuter);
-			END_IF;
-			
+			(* Pack number dwucyfrowy z zerami *)
+			sPackNum := F_StringAddPrefix(INT_TO_STRING(iPack),2,'0');			
 			(* Sklej pack code *)
 			sPackCode := CONCAT(CONCAT('PACK', sPackNum), CONCAT('OUTER', sOuterNum));
 			
-			(* Przypisz *)
+			(* Write Pack Barcodes *)
 			stCACData.Outer[iOuter].PackCode[iPack]			:= sPackCode;
 			stCACData.Outer[iOuter].PackCodeStatus[iPack]	:= 5;
 			stCACData.Outer[iOuter].PackRejectID[iPack]		:= 0;
