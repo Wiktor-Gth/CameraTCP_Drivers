@@ -3,42 +3,138 @@
   <POU Name="FB_CASE_FinaliseDataTests" Id="{97469738-e6cc-4ef5-9bb6-76a47206d06d}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_CASE_FinaliseDataTests EXTENDS TcUnit.FB_TestSuite
 
-]]></Declaration>
+VAR
+	
+	(* Inputs *)
+	stDoorGuardReject_01		: ST_RejectItems;
+	
+	(* In/Out*)
+	stProductInstruction_01		: ST_PCM_Status;
+	stCodeInfo_Outer_01			: ST_CodeInfo;
+	stCACData_01 				: ST_CAC_Data;	(* Case Queue *)
+	stCACDataHMI_01				: ST_HMI_CAC_Data;
+	
+	(* Outputs *)
+	stProductInstruction_main02_01		: ST_PCM_Status;
+	stCACData_main_01 					: ST_CAC_Data;	(* Case Queue *)
+	sRejectCode_01						: T_MaxString;
+	sCaseContent_01						: T_LongSTRING;
+	
+	
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[//==============================================================
 //MAIN TESTS
 //==============================================================
 
-test01_();]]></ST>
+main01_();]]></ST>
     </Implementation>
-    <Method Name="test01_" Id="{994630ca-cb5c-49c7-9f2d-af6c76c304fa}">
-      <Declaration><![CDATA[METHOD INTERNAL test01_
+    <Folder Name="Main" Id="{18672be1-93f6-4f2c-a691-d5382adcaa4f}" />
+    <Method Name="main01_" Id="{53d86170-47ea-4aa9-b8e7-789553e3d0fe}" FolderPath="Main\">
+      <Declaration><![CDATA[METHOD INTERNAL main01_
 VAR
-	fbCase		: FB_CASE_FinaliseData;	
+	fbCase				: FB_CASE_FinaliseData;
+	
+	bDoorReject			: BOOL;	
+	bDone 				: BOOL;
+	bBusy				: BOOL;
+
+	bCACValid			: BOOL;
+	bCACInvalid			: BOOL;
+
+	bCheckDuplicates	: BOOL;
+	bReadyToValidate	: BOOL;
+		
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[TcUnit.TEST('test01_');
+        <ST><![CDATA[
+//Data initialization
+TestInit(stCACData:= stCACData_01, stProductInstruction:= stProductInstruction_01);
+
+//Change some data for test scenario below
 
 fbCase(
-	bExecute:= , 
-	stProductInstruction:= , 
-	stPackCodesDuplicated:= , 
-	stOuterBarcodeDuplicate:= , 
-	stOuterDuplicatedPackCodesFound:= , 
-	stCaseRejectReasons:= , 
-	stCACData:= , 
-	bDone=> , 
-	bBusy=> , 
-	bCACValid=> , 
-	sRejectCode=> , 
-	bIsDuplicateOuters=> , 
-	bIsDuplicatePacks=> , 
-	bReadyToValidate=> , 
-	stUpdateCACData=> 
+	bExecute:= TRUE, 
+	bDoorReject:= bDoorReject, 
+	stDoorGuardReject:= stDoorGuardReject_01, 
+	stProductInstruction:= stProductInstruction_01, 
+	stCodeInfo_Outer:= stCodeInfo_Outer_01, 
+	stCACData:= stCACData_01, 
+	stCACDataHMI:= stCACDataHMI_01, 
+	bDone=> bDone, 
+	bBusy=> bBusy, 
+	bCACValid=> bCACValid, 
+	bCACInvalid=> bCACInvalid, 
+	bCheckDuplicates=> bCheckDuplicates, 
+	bReadyToValidate=> bReadyToValidate, 
+	sRejectCode=> sRejectCode_01, 
+	sCaseContent=> sCaseContent_01
 );
+	
+TcUnit.TEST('main01_');
+
+
+
+	
+// AssertEquals_BOOL( Expected	:= ,
+// 			 	   Actual	:= , 
+// 			 	   Message	:= '');
+						
 
 TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="TestInit" Id="{dbac4856-6d55-4d1d-abbb-1a161c1794bf}">
+      <Declaration><![CDATA[METHOD PRIVATE TestInit
+VAR_IN_OUT
+	stProductInstruction	: ST_PCM_Status;
+	stCACData 				: ST_CAC_Data;
+END_VAR
+
+VAR	
+	rTrigDataInit		: R_TRIG;
+	bDataInit			: BOOL;
+	iOuter				: INT;
+	iPack				: INT;
+	sPackNum			: STRING;
+	sOuterNum			: STRING;
+	sPackCode			: STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+stProductInstruction.nOutersPerCase		:= 50;
+stProductInstruction.nPacksPerOuter 	:= 10;
+
+	FOR iOuter := 1 TO stProductInstruction.nOutersPerCase DO
+		(* Ustaw outer *)
+		stCACData.Outer[iOuter].Barcode    := CONCAT('OUTER', INT_TO_STRING(iOuter));
+		stCACData.Outer[iOuter].OuterCodeStatus := 5;
+		
+		FOR iPack := 1 TO stProductInstruction.nPacksPerOuter DO
+			(* Pack number z zerami *)
+			sPackNum := CONCAT('0', INT_TO_STRING(iPack));  (* dla 1-9: '01'-'09' *)
+			IF iPack = 10 THEN
+				sPackNum := '10';
+			END_IF;
+			
+			(* Outer number z zerami dla 1-9 *)
+			sOuterNum := CONCAT('0', INT_TO_STRING(iOuter));
+			IF iOuter >= 10 THEN
+				sOuterNum := INT_TO_STRING(iOuter);
+			END_IF;
+			
+			(* Sklej pack code *)
+			sPackCode := CONCAT(CONCAT('PACK', sPackNum), CONCAT('OUTER', sOuterNum));
+			
+			(* Przypisz *)
+			stCACData.Outer[iOuter].PackCode[iPack]			:= sPackCode;
+			stCACData.Outer[iOuter].PackCodeStatus[iPack]	:= 5;
+			stCACData.Outer[iOuter].PackRejectID[iPack]		:= 0;
+			
+		END_FOR;
+	END_FOR;	
+]]></ST>
       </Implementation>
     </Method>
   </POU>

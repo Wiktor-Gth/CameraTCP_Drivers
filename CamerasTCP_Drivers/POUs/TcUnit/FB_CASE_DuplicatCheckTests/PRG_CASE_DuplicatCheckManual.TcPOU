@@ -23,6 +23,8 @@ VAR
 	stOuterBarcodeDuplicate				: ST_RejectItems;
 	stOuterDuplicatedPackCodesFound		: ST_RejectItems;
 	stCaseRejectReasons					: ST_RejectReasonsForCase;
+	stRejectReasonForOuters				: ST_RejectReasonsForOuter;	
+	stRejectReasonForPacks				: ST_RejectReasonsForPack;	
 	
 	stCACData 							: ST_CAC_Data;
 	
@@ -325,7 +327,7 @@ END_VAR
                           </o>
                           <o>
                             <o n="Operand" t="Operand">
-                              <v n="Operand">"stPackCodesDuplicated"</v>
+                              <v n="Operand">"stRejectReasonForOuters.stOuterDuplicatedPackCodesFound"</v>
                               <v n="Type">"ST_RejectItems"</v>
                               <v n="Comment">""</v>
                               <v n="SymbolComment">""</v>
@@ -344,7 +346,7 @@ END_VAR
                           </o>
                           <o>
                             <o n="Operand" t="Operand">
-                              <v n="Operand">"stOuterBarcodeDuplicate"</v>
+                              <v n="Operand">"stRejectReasonForOuters.stOuterBarcodeDuplicate"</v>
                               <v n="Type">"ST_RejectItems"</v>
                               <v n="Comment">""</v>
                               <v n="SymbolComment">""</v>
@@ -363,7 +365,7 @@ END_VAR
                           </o>
                           <o>
                             <o n="Operand" t="Operand">
-                              <v n="Operand">"stOuterDuplicatedPackCodesFound"</v>
+                              <v n="Operand">"stRejectReasonForOuters.stOuterDuplicatedPackCodesFound"</v>
                               <v n="Type">"ST_RejectItems"</v>
                               <v n="Comment">""</v>
                               <v n="SymbolComment">""</v>
@@ -402,7 +404,7 @@ END_VAR
                           <o>
                             <o n="Operand" t="Operand">
                               <v n="Operand">"stCACData"</v>
-                              <v n="Type">"ST_CAC_Data"</v>
+                              <v n="Type">"ST_CAC_Data[REF]"</v>
                               <v n="Comment">""</v>
                               <v n="SymbolComment">""</v>
                               <v n="Address">""</v>

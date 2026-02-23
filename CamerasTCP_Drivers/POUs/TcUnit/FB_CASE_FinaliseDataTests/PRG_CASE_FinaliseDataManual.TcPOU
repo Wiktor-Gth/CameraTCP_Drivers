@@ -3,8 +3,40 @@
   <POU Name="PRG_CASE_FinaliseDataManual" Id="{de1c4946-2f6a-46af-94e8-69091e414096}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM PRG_CASE_FinaliseDataManual
 VAR
-	fbCaseFinaliseData		: FB_CASE_FinaliseData;
+	fbCase_FinaliseData		: FB_CASE_FinaliseData;
 	
+	(* Init function/method declarations*)
+	rTrigDataInit		: R_TRIG;
+	bDataInit			: BOOL;
+	iOuter				: INT;
+	iPack				: INT;
+	sPackNum			: STRING;
+	sOuterNum			: STRING;
+	sPackCode			: STRING;
+	
+	(* Inputs *)
+	bExecute 				: BOOL;		(* set TRUE to move Outers *)
+	bDoorReject				: BOOL;
+	stRejectReasonsForCase	: ST_RejectReasonsForCase; //inicjalizacja rejectResonow
+	
+	(* In/Out *)
+	stProductInstruction	: ST_PCM_Status;
+	stCodeInfo_Outer		: ST_CodeInfo;
+	stCACData 				: ST_CAC_Data;	(* Case Queue *)
+	stCACDataHMI			: ST_HMI_CAC_Data;
+	
+	(* Outputs *)
+	bDone 					: BOOL;
+	bBusy					: BOOL;
+
+	bCACValid				: BOOL;
+	bCACInvalid				: BOOL;
+
+	bCheckDuplicates		: BOOL;
+	bReadyToValidate		: BOOL;
+	
+	sRejectCode				: T_MaxString;
+	sCaseContent			: T_LongSTRING;
 	
 END_VAR
 ]]></Declaration>
@@ -27,9 +59,67 @@ END_VAR
                   <v n="OutCommented">false</v>
                   <l2 n="NetworkItems" cet="BoxTreeBox">
                     <o>
+                      <v n="BoxType">"Init"</v>
+                      <o n="Instance" t="Operand">
+                        <n n="Operand" />
+                        <v n="Type">""</v>
+                        <v n="Comment">""</v>
+                        <v n="SymbolComment">""</v>
+                        <v n="Address">""</v>
+                        <o n="Flags" t="Flags">
+                          <v n="Flags">0</v>
+                          <v n="Fixed">false</v>
+                          <v n="Extensible">false</v>
+                        </o>
+                        <v n="LValue">false</v>
+                        <v n="Boolean">false</v>
+                        <v n="IsInstance">true</v>
+                        <v n="Id">57L</v>
+                      </o>
+                      <o n="OutputItems" t="OutputItemList">
+                        <l2 n="OutputItems" />
+                      </o>
+                      <o n="Flags" t="Flags">
+                        <v n="Flags">0</v>
+                        <v n="Fixed">false</v>
+                        <v n="Extensible">false</v>
+                      </o>
+                      <n n="InputFlags" />
+                      <l2 n="InputItems" />
+                      <o n="InputParam" t="ParamList">
+                        <l2 n="Names" />
+                        <l2 n="Types" />
+                      </o>
+                      <o n="OutputParam" t="ParamList">
+                        <l2 n="Names" />
+                        <l2 n="Types" />
+                      </o>
+                      <v n="CallType" t="Operator">Action</v>
+                      <v n="EN">false</v>
+                      <v n="ENO">false</v>
+                      <n n="STSnippet" />
+                      <v n="ContainsExtensibleInputs">false</v>
+                      <v n="ProvidesSTSnippet">false</v>
+                      <v n="Id">58L</v>
+                    </o>
+                  </l2>
+                  <l2 n="Connectors" />
+                  <v n="Id">56L</v>
+                </o>
+                <o>
+                  <v n="ILActive">false</v>
+                  <v n="FBDValid">false</v>
+                  <v n="ILValid">false</v>
+                  <l2 n="ILLines" />
+                  <v n="Comment">""</v>
+                  <v n="Title">""</v>
+                  <v n="Label">""</v>
+                  <v n="OutCommented">false</v>
+                  <l2 n="NetworkItems" cet="BoxTreeBox">
+                    <o>
                       <v n="BoxType">"FB_CASE_FinaliseData"</v>
                       <o n="Instance" t="Operand">
-                        <v n="Operand">"fbCaseFinaliseData"</v>
+                        <v n="Operand">"fbCase_FinaliseData"</v>
                         <v n="Type">"FB_CASE_FinaliseData"</v>
                         <v n="Comment">""</v>
                         <v n="SymbolComment">""</v>
@@ -48,7 +138,7 @@ END_VAR
                         <l2 n="OutputItems" cet="Operand">
                           <n />
                           <o>
-                            <v n="Operand">"???"</v>
+                            <v n="Operand">"bBusy"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -64,7 +154,7 @@ END_VAR
                             <v n="Id">39L</v>
                           </o>
                           <o>
-                            <v n="Operand">"???"</v>
+                            <v n="Operand">"bCACValid"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -80,7 +170,7 @@ END_VAR
                             <v n="Id">40L</v>
                           </o>
                           <o>
-                            <v n="Operand">"???"</v>
+                            <v n="Operand">"bCACInvalid"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -96,7 +186,7 @@ END_VAR
                             <v n="Id">41L</v>
                           </o>
                           <o>
-                            <v n="Operand">"???"</v>
+                            <v n="Operand">"bCheckDuplicates"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -112,7 +202,7 @@ END_VAR
                             <v n="Id">42L</v>
                           </o>
                           <o>
-                            <v n="Operand">"???"</v>
+                            <v n="Operand">"bReadyToValidate"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -128,7 +218,7 @@ END_VAR
                             <v n="Id">43L</v>
                           </o>
                           <o>
-                            <v n="Operand">"???"</v>
+                            <v n="Operand">"sRejectCode"</v>
                             <v n="Type">"T_MaxString"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -144,7 +234,7 @@ END_VAR
                             <v n="Id">44L</v>
                           </o>
                           <o>
-                            <v n="Operand">"???"</v>
+                            <v n="Operand">"sCaseContent"</v>
                             <v n="Type">"T_LongSTRING"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -170,7 +260,7 @@ END_VAR
                       <l2 n="InputItems" cet="BoxTreeOperand">
                         <o>
                           <o n="Operand" t="Operand">
-                            <v n="Operand">"???"</v>
+                            <v n="Operand">"bExecute"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -189,7 +279,7 @@ END_VAR
                         </o>
                         <o>
                           <o n="Operand" t="Operand">
-                            <v n="Operand">"???"</v>
+                            <v n="Operand">"bDoorReject"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -208,7 +298,7 @@ END_VAR
                         </o>
                         <o>
                           <o n="Operand" t="Operand">
-                            <v n="Operand">"???"</v>
+                            <v n="Operand">"stRejectReasonsForCase.stDoorGuardReject"</v>
                             <v n="Type">"ST_RejectItems"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -227,8 +317,8 @@ END_VAR
                         </o>
                         <o>
                           <o n="Operand" t="Operand">
-                            <v n="Operand">"???"</v>
-                            <v n="Type">"ST_PCM_Status[REF]"</v>
+                            <v n="Operand">"stProductInstruction"</v>
+                            <v n="Type">"ST_PCM_Status"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -246,8 +336,8 @@ END_VAR
                         </o>
                         <o>
                           <o n="Operand" t="Operand">
-                            <v n="Operand">"???"</v>
-                            <v n="Type">"ST_CodeInfo[REF]"</v>
+                            <v n="Operand">"stCodeInfo_Outer"</v>
+                            <v n="Type">"ST_CodeInfo"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -265,8 +355,8 @@ END_VAR
                         </o>
                         <o>
                           <o n="Operand" t="Operand">
-                            <v n="Operand">"???"</v>
-                            <v n="Type">"ST_CAC_Data[REF]"</v>
+                            <v n="Operand">"stCACData"</v>
+                            <v n="Type">"ST_CAC_Data"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -284,8 +374,8 @@ END_VAR
                         </o>
                         <o>
                           <o n="Operand" t="Operand">
-                            <v n="Operand">"???"</v>
-                            <v n="Type">"ST_HMI_CAC_Data[REF]"</v>
+                            <v n="Operand">"stCACDataHMI"</v>
+                            <v n="Type">"ST_HMI_CAC_Data"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -379,5 +469,55 @@ END_VAR
         </XmlArchive>
       </NWL>
     </Implementation>
+    <Action Name="Init" Id="{08194a4d-05fa-4272-8ec8-ee3a74e4e1b9}">
+      <Implementation>
+        <ST><![CDATA[
+rTrigDataInit(CLK := bDataInit);
+
+IF rTrigDataInit.Q THEN
+	
+stProductInstruction.nOutersPerCase		:= 50;
+stProductInstruction.nPacksPerOuter 	:= 10;
+
+	FOR iOuter := 1 TO stProductInstruction.nOutersPerCase DO
+		(* Ustaw outer *)
+		stCACData.Outer[iOuter].Barcode    := CONCAT('OUTER', F_StringAddPrefix(INT_TO_STRING(iOuter),2,'0'));
+		stCACData.Outer[iOuter].OuterCodeStatus := 5;
+		
+		FOR iPack := 1 TO stProductInstruction.nPacksPerOuter DO
+			(* Pack number z zerami *)
+			sPackNum := CONCAT('0', INT_TO_STRING(iPack));  (* dla 1-9: '01'-'09' *)
+			IF iPack = 10 THEN
+				sPackNum := '10';
+			END_IF;
+			
+			(* Outer number z zerami dla 1-9 *)
+			sOuterNum := CONCAT('0', INT_TO_STRING(iOuter));
+			IF iOuter >= 10 THEN
+				sOuterNum := INT_TO_STRING(iOuter);
+			END_IF;
+			
+			(* Sklej pack code *)
+			sPackCode := CONCAT(CONCAT('PACK', sPackNum), CONCAT('OUTER', sOuterNum));
+			
+			(* Przypisz *)
+			stCACData.Outer[iOuter].PackCode[iPack]			:= sPackCode;
+			stCACData.Outer[iOuter].PackCodeStatus[iPack]	:= 5;
+			stCACData.Outer[iOuter].PackRejectID[iPack]		:= 0;
+			
+		END_FOR;
+	END_FOR;	
+	
+END_IF
+
+//initialize needed data structures
+stCACData.NumberOfOuters				:= stProductInstruction.nOutersPerCase;
+stCodeInfo_Outer.nEntireLength					:= 7;
+stCodeInfo_Outer.stSerialCode.nCodeStartPos 	:= 1;
+stCodeInfo_Outer.stSerialCode.nCodeLength 		:= 7;
+
+]]></ST>
+      </Implementation>
+    </Action>
   </POU>
 </TcPlcObject>

@@ -5,16 +5,18 @@
 
 VAR
 	
-	(* In/Out test 01*)
+	(* In/Out test*)
 	stProductInstruction_01					: ST_PCM_Status;
 	stPackCodesDuplicated_01				: ST_RejectItems;
 	stOuterBarcodeDuplicate_01				: ST_RejectItems;
 	stOuterDuplicatedPackCodesFound_01		: ST_RejectItems;
 	stCaseRejectReasons_01					: ST_RejectReasonsForCase;		
-	stUpdateCACData_01						: ST_CAC_Data;
+	stRejectReasonForOuters_01				: ST_RejectReasonsForOuter;	
+	stRejectReasonForPacks_01				: ST_RejectReasonsForPack;	
 	
 	stCACData_01 							: ST_CAC_Data;
 	
+	stUpdateCACData_01						: ST_CAC_Data;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -22,7 +24,10 @@ END_VAR
 //MAIN TESTS
 //==============================================================
 
-main01_bIsDuplicateOuterTRUEonOuterBarcodeDuplicate();]]></ST>
+main01_bIsDuplicateOuterTRUEonOuterBarcodeDuplicate();
+main02_bIsDuplicatePackTRUEonPackBarcodeDuplicate();
+main03_OuterRejectIDChangedWhenOuterDuplicate();
+]]></ST>
     </Implementation>
     <Folder Name="Main" Id="{90804e8b-9724-4b91-a81d-e1b2ab2e1846}" />
     <Method Name="main01_bIsDuplicateOuterTRUEonOuterBarcodeDuplicate" Id="{da094c5b-b96c-4f61-928e-83b515b4b561}" FolderPath="Main\">
@@ -69,6 +74,104 @@ fbCase(
 AssertEquals_BOOL( Expected	:= TRUE,
 			 	   Actual	:= bIsDuplicateOuter, 
 			 	   Message	:= 'Duplicated Outer barcode not found');
+						
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="main02_bIsDuplicatePackTRUEonPackBarcodeDuplicate" Id="{acfaf42b-256c-4b55-8e7a-ce9c9bdbdfa3}" FolderPath="Main\">
+      <Declaration><![CDATA[METHOD INTERNAL main02_bIsDuplicatePackTRUEonPackBarcodeDuplicate
+VAR
+	fbCase					: FB_CASE_DuplicatCheck;
+	bIsDuplicateOuter		: BOOL;
+	bIsDuplicatePacks		: BOOL;
+	
+
+	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//Data initialization
+TestInit(stCACData:= stCACData_01, stProductInstruction:= stProductInstruction_01);
+
+//Change some data for test scenario below
+stCACData_01.Outer[9].PackCode[2] := stCACData_01.Outer[15].PackCode[5];
+
+	
+TcUnit.TEST('main02_bIsDuplicatePackTRUEonPackBarcodeDuplicate');
+
+fbCase(
+	bExecute:= TRUE, 
+	stProductInstruction:= stProductInstruction_01, 
+	stPackCodesDuplicated:= stPackCodesDuplicated_01, 
+	stOuterBarcodeDuplicate:= stOuterBarcodeDuplicate_01, 
+	stOuterDuplicatedPackCodesFound:= stOuterDuplicatedPackCodesFound_01, 
+	stCaseRejectReasons:= stCaseRejectReasons_01, 
+	stCACData:= stCACData_01, 
+	bDone=> , 
+	bBusy=> , 
+	bCACValid=> , 
+	sRejectCode=> , 
+	bIsDuplicateOuters=> bIsDuplicateOuter, 
+	bIsDuplicatePacks=> bIsDuplicatePacks, 
+	bReadyToValidate=> , 
+	stUpdateCACData=> stUpdateCACData_01
+);
+
+	
+AssertEquals_BOOL( Expected	:= TRUE,
+			 	   Actual	:= bIsDuplicatePacks, 
+			 	   Message	:= 'Duplicated Pack barcode not found');
+						
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="main03_OuterRejectIDChangedWhenOuterDuplicate" Id="{0d978ba3-ba7d-422e-b70f-991d7b014657}" FolderPath="Main\">
+      <Declaration><![CDATA[METHOD INTERNAL main03_OuterRejectIDChangedWhenOuterDuplicate
+VAR
+	fbCase					: FB_CASE_DuplicatCheck;
+	bIsDuplicateOuter		: BOOL;
+	bIsDuplicatePacks		: BOOL;
+	
+
+	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//Data initialization
+TestInit(stCACData:= stCACData_01, stProductInstruction:= stProductInstruction_01);
+
+//Change some data for test scenario below
+stCACData_01.Outer[2].Barcode := stCACData_01.Outer[49].Barcode;
+
+	
+TcUnit.TEST('main03_OuterRejectIDChangedWhenOuterDuplicate');
+
+fbCase(
+	bExecute:= TRUE, 
+	stProductInstruction:= stProductInstruction_01, 
+	stPackCodesDuplicated:= stRejectReasonForOuters_01.stOuterDuplicatedPackCodesFound, 
+	stOuterBarcodeDuplicate:= stRejectReasonForOuters_01.stOuterBarcodeDuplicate, 
+	stOuterDuplicatedPackCodesFound:= stRejectReasonForOuters_01.stOuterDuplicatedPackCodesFound, 
+	stCaseRejectReasons:= stCaseRejectReasons_01, 
+	stCACData:= stCACData_01, 
+	bDone=> , 
+	bBusy=> , 
+	bCACValid=> , 
+	sRejectCode=> , 
+	bIsDuplicateOuters=> bIsDuplicateOuter, 
+	bIsDuplicatePacks=> bIsDuplicatePacks, 
+	bReadyToValidate=> , 
+	stUpdateCACData=> stUpdateCACData_01
+);
+
+	
+AssertEquals_UINT(Expected := 206,
+                  Actual := stCACData_01.Outer[2].OuterRejectID,
+                  Message := 'OuterRejectID not updated when duplicate outer barcode');
 						
 
 TEST_FINISHED();]]></ST>
