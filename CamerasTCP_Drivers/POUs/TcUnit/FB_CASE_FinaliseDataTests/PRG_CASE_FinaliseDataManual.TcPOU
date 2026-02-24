@@ -480,41 +480,52 @@ stProductInstruction.nOutersPerCase		:= 50;
 stProductInstruction.nPacksPerOuter 	:= 10;
 
 	FOR iOuter := 1 TO stProductInstruction.nOutersPerCase DO
-		(* Ustaw outer *)
-		stCACData.Outer[iOuter].Barcode    := CONCAT('OUTER', F_StringAddPrefix(INT_TO_STRING(iOuter),2,'0'));
+		(* Outer number z zerami *)
+		sOuterNum := F_StringAddPrefix(INT_TO_STRING(iOuter),2,'0');
+		
+		(* Write Outers barcodes *)
+		stCACData.Outer[iOuter].Barcode    := CONCAT('OUTER', sOuterNum);
 		stCACData.Outer[iOuter].OuterCodeStatus := 5;
+		stCACData.Outer[iOuter].OuterRejectCode := 'OK';
 		
 		FOR iPack := 1 TO stProductInstruction.nPacksPerOuter DO
-			(* Pack number z zerami *)
-			sPackNum := CONCAT('0', INT_TO_STRING(iPack));  (* dla 1-9: '01'-'09' *)
-			IF iPack = 10 THEN
-				sPackNum := '10';
-			END_IF;
-			
-			(* Outer number z zerami dla 1-9 *)
-			sOuterNum := CONCAT('0', INT_TO_STRING(iOuter));
-			IF iOuter >= 10 THEN
-				sOuterNum := INT_TO_STRING(iOuter);
-			END_IF;
-			
+			(* Pack number dwucyfrowy z zerami *)
+			sPackNum := F_StringAddPrefix(INT_TO_STRING(iPack),2,'0');			
 			(* Sklej pack code *)
 			sPackCode := CONCAT(CONCAT('PACK', sPackNum), CONCAT('OUTER', sOuterNum));
 			
-			(* Przypisz *)
+			(* Write Pack Barcodes / Data*)
 			stCACData.Outer[iOuter].PackCode[iPack]			:= sPackCode;
 			stCACData.Outer[iOuter].PackCodeStatus[iPack]	:= 5;
-			stCACData.Outer[iOuter].PackRejectID[iPack]		:= 0;
+			stCACData.Outer[iOuter].PackRejectID[iPack]		:= 0;			
+			stCACData.Outer[iOuter].PackRejectCode[iPack]	:= 'OK';
+			
+						
+			stCACData.Outer[iOuter].NumberOfPacks := stProductInstruction.nPacksPerOuter;
 			
 		END_FOR;
 	END_FOR;	
-	
-END_IF
 
 //initialize needed data structures
-stCACData.NumberOfOuters				:= stProductInstruction.nOutersPerCase;
+stCACData.NumberOfOuters						:= stProductInstruction.nOutersPerCase;
+stCACData.CaseRejectCode						:= 'OK';
 stCodeInfo_Outer.nEntireLength					:= 7;
 stCodeInfo_Outer.stSerialCode.nCodeStartPos 	:= 1;
 stCodeInfo_Outer.stSerialCode.nCodeLength 		:= 7;
+
+(* opcje do testowania *)
+//stCACData.Barcode					:= 'Barcode';
+//bDoorReject						:= true/false;	
+//stCACData.CaseRejectCode			:= 'OK' or '';
+//stCACDataHMI.nNumberOfPacks ma byc rowny stProductInstruction.nPacksPerOuter;
+// sprawdzac wartosc stCACDataHMI.aOuter[nOuterIndex].sBarcode = concat z numerami na koncu
+// w zaleznoci jaka wartosc OuterRejectCode / linia 47 bloku
+// sprawdzic warunek ze jak ma byc bCACValid albo bCACInvalid
+	
+END_IF
+
+
+
 
 ]]></ST>
       </Implementation>

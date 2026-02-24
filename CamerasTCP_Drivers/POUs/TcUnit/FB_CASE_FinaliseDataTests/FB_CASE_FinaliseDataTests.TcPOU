@@ -5,35 +5,243 @@
 
 VAR
 	
-	(* Inputs *)
-	stDoorGuardReject_01		: ST_RejectItems;
+	(* In/Out test*)
+	stProductInstruction_tests					: ST_PCM_Status;
+	stOuterBarcodeDuplicate_tests				: ST_RejectItems;
+	stOuterDuplicatedPackCodesFound_tests		: ST_RejectItems;
+	stCaseRejectReasons_tests					: ST_RejectReasonsForCase;		
+	stRejectReasonForOuters_tests				: ST_RejectReasonsForOuter;	
+	stRejectReasonForPacks_tests				: ST_RejectReasonsForPack;		
+	stCodeInfo_Outer_tests						: ST_CodeInfo;
 	
-	(* In/Out*)
-	stProductInstruction_01		: ST_PCM_Status;
-	stCodeInfo_Outer_01			: ST_CodeInfo;
-	stCACData_01 				: ST_CAC_Data;	(* Case Queue *)
-	stCACDataHMI_01				: ST_HMI_CAC_Data;
-	
-	(* Outputs *)
-	stProductInstruction_main02_01		: ST_PCM_Status;
-	stCACData_main_01 					: ST_CAC_Data;	(* Case Queue *)
-	sRejectCode_01						: T_MaxString;
-	sCaseContent_01						: T_LongSTRING;
+	stCACData_tests 							: ST_CAC_Data;	
+	stUpdateCACData_tests						: ST_CAC_Data;	
+	sRejectCode_tests							: T_MaxString;
+	stCACDataHMI_tests							: ST_HMI_CAC_Data;
+	sCaseContent_tests							: T_LongSTRING;
 	
 	
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[//==============================================================
-//MAIN TESTS
-//==============================================================
+      <ST><![CDATA[
+stProductInstruction_tests.nOutersPerCase			:= 50;
+stProductInstruction_tests.nPacksPerOuter 			:= 10;
 
-main01_();]]></ST>
+
+stCACData_tests.NumberOfOuters							:= stProductInstruction_tests.nOutersPerCase;
+stCACData_tests.CaseRejectCode							:= 'OK';
+stCodeInfo_Outer_tests.nEntireLength					:= 7;
+stCodeInfo_Outer_tests.stSerialCode.nCodeStartPos 		:= 1;
+stCodeInfo_Outer_tests.stSerialCode.nCodeLength 		:= 7;
+
+//==============================================================
+//01.Main
+//==============================================================
+main01_FBnotExecuted_bDoneFALSE();
+main02_bCACValidTrueOnValidData();
+main03_bCACInvalidFalseOnValidData();
+
+
+//==============================================================
+//02.CaseContenr	
+//==============================================================
+caseContent01_sCaseContentValueValid();
+caseContent02_sCaseContentValueToShort();
+caseContent03_sCaseContentValueToLong();
+
+//==============================================================
+//03.
+//==============================================================]]></ST>
     </Implementation>
-    <Folder Name="Main" Id="{18672be1-93f6-4f2c-a691-d5382adcaa4f}" />
-    <Method Name="main01_" Id="{53d86170-47ea-4aa9-b8e7-789553e3d0fe}" FolderPath="Main\">
-      <Declaration><![CDATA[METHOD INTERNAL main01_
+    <Folder Name="01.Main" Id="{18672be1-93f6-4f2c-a691-d5382adcaa4f}" />
+    <Folder Name="02.CaseContent" Id="{df8ff07e-0c64-4e7f-909a-a92b626c02f7}" />
+    <Method Name="caseContent01_sCaseContentValueValid" Id="{e341c1b0-d586-41ab-bf7d-bd8efd2bd45f}" FolderPath="02.CaseContent\">
+      <Declaration><![CDATA[METHOD INTERNAL caseContent01_sCaseContentValueValid
 VAR
-	fbCase				: FB_CASE_FinaliseData;
+	fbCase_tests		: FB_CASE_FinaliseData;
+	
+	bDoorReject			: BOOL;	
+	bDone 				: BOOL;
+	bBusy				: BOOL;
+
+	bCACValid			: BOOL;
+	bCACInvalid			: BOOL;
+
+	bCheckDuplicates	: BOOL;
+	bReadyToValidate	: BOOL;
+	
+	minLength			: UDINT;
+	nCompare			: DINT;
+	sCaseContentTEMP	: T_LongSTRING; 
+		
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//Data initialization
+TestInit(stCACData:= stCACData_tests, stProductInstruction:= stProductInstruction_tests);
+
+//Change some data for test scenario below
+sCaseContentTEMP := ' [50]:   OUTER01   OUTER02   OUTER03   OUTER04   OUTER05   OUTER06   OUTER07   OUTER08   OUTER09   OUTER10   OUTER11   OUTER12   OUTER13   OUTER14   OUTER15   OUTER16   OUTER17   OUTER18   OUTER19   OUTER20   OUTER21   OUTER22   OUTER23   OUTER24   OUTER25   OUTER26   OUTER27   OUTER28   OUTER29   OUTER30   OUTER31   OUTER32   OUTER33   OUTER34   OUTER35   OUTER36   OUTER37   OUTER38   OUTER39   OUTER40   OUTER41   OUTER42   OUTER43   OUTER44   OUTER45   OUTER46   OUTER47   OUTER48   OUTER49   OUTER50';
+
+	
+TcUnit.TEST('caseContent01_sCaseContentValueValid');
+
+fbCase_tests(
+	bExecute:= TRUE, 
+	bDoorReject:= bDoorReject, 
+	stDoorGuardReject:= stCaseRejectReasons_tests.stDoorGuardReject, 
+	stProductInstruction:= stProductInstruction_tests, 
+	stCodeInfo_Outer:= stCodeInfo_Outer_tests, 
+	stCACData:= stCACData_tests, 
+	stCACDataHMI:= stCACDataHMI_tests, 
+	bDone=> bDone, 
+	bBusy=> bBusy, 
+	bCACValid=> bCACValid, 
+	bCACInvalid=> bCACInvalid, 
+	bCheckDuplicates=> bCheckDuplicates, 
+	bReadyToValidate=> bReadyToValidate, 
+	sRejectCode=> sRejectCode_tests, 
+	sCaseContent=> sCaseContent_tests);
+
+
+minLength 	:= MIN(TO_UDINT(LEN(sCaseContentTEMP)), TO_UDINT(LEN(sCaseContent_tests)));
+nCompare	:= MEMCMP(pBuf1:= ADR(sCaseContentTEMP), pBuf2:= ADR(sCaseContent_tests), n:= minLength);
+	
+AssertEquals_DINT(Expected := 0,
+                  Actual := nCompare,
+                  Message := 'Value of sCaseContent wrong');
+						
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="caseContent02_sCaseContentValueToShort" Id="{b9329292-b258-453d-a796-3becfbf04278}" FolderPath="02.CaseContent\">
+      <Declaration><![CDATA[METHOD INTERNAL caseContent02_sCaseContentValueToShort
+VAR
+	fbCase_tests		: FB_CASE_FinaliseData;
+	
+	bDoorReject			: BOOL;	
+	bDone 				: BOOL;
+	bBusy				: BOOL;
+
+	bCACValid			: BOOL;
+	bCACInvalid			: BOOL;
+
+	bCheckDuplicates	: BOOL;
+	bReadyToValidate	: BOOL;
+	
+	minLength			: UDINT;
+	nCompare			: DINT;
+	sCaseContentTEMP	: T_LongSTRING; 
+		
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//Data initialization
+TestInit(stCACData:= stCACData_tests, stProductInstruction:= stProductInstruction_tests);
+
+//Change some data for test scenario below
+sCaseContentTEMP := ' [50]:   OUTER02   OUTER03   OUTER04   OUTER05   OUTER06   OUTER07   OUTER08   OUTER09   OUTER10   OUTER11   OUTER12   OUTER13   OUTER14   OUTER15   OUTER16   OUTER17   OUTER18   OUTER19   OUTER20   OUTER21   OUTER22   OUTER23   OUTER24   OUTER25   OUTER26   OUTER27   OUTER28   OUTER29   OUTER30   OUTER31   OUTER32   OUTER33   OUTER34   OUTER35   OUTER36   OUTER37   OUTER38   OUTER39   OUTER40   OUTER41   OUTER42   OUTER43   OUTER44   OUTER45   OUTER46   OUTER47   OUTER48   OUTER49   OUTER50';
+
+	
+TcUnit.TEST('caseContent02_sCaseContentValueToShort');
+
+fbCase_tests(
+	bExecute:= TRUE, 
+	bDoorReject:= bDoorReject, 
+	stDoorGuardReject:= stCaseRejectReasons_tests.stDoorGuardReject, 
+	stProductInstruction:= stProductInstruction_tests, 
+	stCodeInfo_Outer:= stCodeInfo_Outer_tests, 
+	stCACData:= stCACData_tests, 
+	stCACDataHMI:= stCACDataHMI_tests, 
+	bDone=> bDone, 
+	bBusy=> bBusy, 
+	bCACValid=> bCACValid, 
+	bCACInvalid=> bCACInvalid, 
+	bCheckDuplicates=> bCheckDuplicates, 
+	bReadyToValidate=> bReadyToValidate, 
+	sRejectCode=> sRejectCode_tests, 
+	sCaseContent=> sCaseContent_tests);
+
+
+minLength 	:= MAX(TO_UDINT(LEN(sCaseContentTEMP)), TO_UDINT(LEN(sCaseContent_tests)));
+nCompare	:= MEMCMP(pBuf1:= ADR(sCaseContentTEMP), pBuf2:= ADR(sCaseContent_tests), n:= minLength);
+	
+AssertEquals_DINT(Expected := 1,
+                  Actual := nCompare,
+                  Message := 'Value of sCaseContent wrong');
+						
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="caseContent03_sCaseContentValueToLong" Id="{6851fb6a-702b-479d-b8e5-f5db82633a9f}" FolderPath="02.CaseContent\">
+      <Declaration><![CDATA[METHOD INTERNAL caseContent03_sCaseContentValueToLong
+VAR
+	fbCase_tests		: FB_CASE_FinaliseData;
+	
+	bDoorReject			: BOOL;	
+	bDone 				: BOOL;
+	bBusy				: BOOL;
+
+	bCACValid			: BOOL;
+	bCACInvalid			: BOOL;
+
+	bCheckDuplicates	: BOOL;
+	bReadyToValidate	: BOOL;
+	
+	minLength			: UDINT;
+	nCompare			: DINT;
+	sCaseContentTEMP	: T_LongSTRING; 
+		
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//Data initialization
+TestInit(stCACData:= stCACData_tests, stProductInstruction:= stProductInstruction_tests);
+
+//Change some data for test scenario below
+sCaseContentTEMP := ' [50]:   OUTER51   OUTER01   OUTER02   OUTER03   OUTER04   OUTER05   OUTER06   OUTER07   OUTER08   OUTER09   OUTER10   OUTER11   OUTER12   OUTER13   OUTER14   OUTER15   OUTER16   OUTER17   OUTER18   OUTER19   OUTER20   OUTER21   OUTER22   OUTER23   OUTER24   OUTER25   OUTER26   OUTER27   OUTER28   OUTER29   OUTER30   OUTER31   OUTER32   OUTER33   OUTER34   OUTER35   OUTER36   OUTER37   OUTER38   OUTER39   OUTER40   OUTER41   OUTER42   OUTER43   OUTER44   OUTER45   OUTER46   OUTER47   OUTER48   OUTER49   OUTER50';
+
+	
+TcUnit.TEST('caseContent03_sCaseContentValueToLong');
+
+fbCase_tests(
+	bExecute:= TRUE, 
+	bDoorReject:= bDoorReject, 
+	stDoorGuardReject:= stCaseRejectReasons_tests.stDoorGuardReject, 
+	stProductInstruction:= stProductInstruction_tests, 
+	stCodeInfo_Outer:= stCodeInfo_Outer_tests, 
+	stCACData:= stCACData_tests, 
+	stCACDataHMI:= stCACDataHMI_tests, 
+	bDone=> bDone, 
+	bBusy=> bBusy, 
+	bCACValid=> bCACValid, 
+	bCACInvalid=> bCACInvalid, 
+	bCheckDuplicates=> bCheckDuplicates, 
+	bReadyToValidate=> bReadyToValidate, 
+	sRejectCode=> sRejectCode_tests, 
+	sCaseContent=> sCaseContent_tests);
+
+
+minLength 	:= MIN(TO_UDINT(LEN(sCaseContentTEMP)), TO_UDINT(LEN(sCaseContent_tests)));
+nCompare	:= MEMCMP(pBuf1:= ADR(sCaseContentTEMP), pBuf2:= ADR(sCaseContent_tests), n:= minLength);
+	
+AssertEquals_DINT(Expected := -1,
+                  Actual := nCompare,
+                  Message := 'Value of sCaseContent wrong');
+						
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="main01_FBnotExecuted_bDoneFALSE" Id="{53d86170-47ea-4aa9-b8e7-789553e3d0fe}" FolderPath="01.Main\">
+      <Declaration><![CDATA[METHOD INTERNAL main01_FBnotExecuted_bDoneFALSE
+VAR
+	fbCase_tests		: FB_CASE_FinaliseData;
 	
 	bDoorReject			: BOOL;	
 	bDone 				: BOOL;
@@ -50,36 +258,149 @@ END_VAR
       <Implementation>
         <ST><![CDATA[
 //Data initialization
-TestInit(stCACData:= stCACData_01, stProductInstruction:= stProductInstruction_01);
+TestInit(stCACData:= stCACData_tests, stProductInstruction:= stProductInstruction_tests);
 
 //Change some data for test scenario below
 
-fbCase(
+
+	
+TcUnit.TEST('main01_FBnotExecuted_bDoneFALSE');
+
+fbCase_tests(
 	bExecute:= TRUE, 
 	bDoorReject:= bDoorReject, 
-	stDoorGuardReject:= stDoorGuardReject_01, 
-	stProductInstruction:= stProductInstruction_01, 
-	stCodeInfo_Outer:= stCodeInfo_Outer_01, 
-	stCACData:= stCACData_01, 
-	stCACDataHMI:= stCACDataHMI_01, 
+	stDoorGuardReject:= stCaseRejectReasons_tests.stDoorGuardReject, 
+	stProductInstruction:= stProductInstruction_tests, 
+	stCodeInfo_Outer:= stCodeInfo_Outer_tests, 
+	stCACData:= stCACData_tests, 
+	stCACDataHMI:= stCACDataHMI_tests, 
 	bDone=> bDone, 
 	bBusy=> bBusy, 
 	bCACValid=> bCACValid, 
 	bCACInvalid=> bCACInvalid, 
 	bCheckDuplicates=> bCheckDuplicates, 
 	bReadyToValidate=> bReadyToValidate, 
-	sRejectCode=> sRejectCode_01, 
-	sCaseContent=> sCaseContent_01
-);
-	
-TcUnit.TEST('main01_');
+	sRejectCode=> sRejectCode_tests, 
+	sCaseContent=> sCaseContent_tests);
 
 
 
 	
-// AssertEquals_BOOL( Expected	:= ,
-// 			 	   Actual	:= , 
-// 			 	   Message	:= '');
+AssertEquals_BOOL( Expected	:= TRUE,
+			 	   Actual	:= bDone, 
+			 	   Message	:= 'FB_CASE_FinaliseData not executed');
+						
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="main02_bCACValidTrueOnValidData" Id="{61e58a54-5a2c-4acd-b2b6-3ebacb7059a3}" FolderPath="01.Main\">
+      <Declaration><![CDATA[METHOD INTERNAL main02_bCACValidTrueOnValidData
+VAR
+	fbCase_tests		: FB_CASE_FinaliseData;
+	
+	bDoorReject			: BOOL;	
+	bDone 				: BOOL;
+	bBusy				: BOOL;
+
+	bCACValid			: BOOL;
+	bCACInvalid			: BOOL;
+
+	bCheckDuplicates	: BOOL;
+	bReadyToValidate	: BOOL;
+		
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//Data initialization
+TestInit(stCACData:= stCACData_tests, stProductInstruction:= stProductInstruction_tests);
+
+//Change some data for test scenario below
+
+
+	
+TcUnit.TEST('main02_bCACValidTrueOnValidData');
+
+fbCase_tests(
+	bExecute:= TRUE, 
+	bDoorReject:= bDoorReject, 
+	stDoorGuardReject:= stCaseRejectReasons_tests.stDoorGuardReject, 
+	stProductInstruction:= stProductInstruction_tests, 
+	stCodeInfo_Outer:= stCodeInfo_Outer_tests, 
+	stCACData:= stCACData_tests, 
+	stCACDataHMI:= stCACDataHMI_tests, 
+	bDone=> bDone, 
+	bBusy=> bBusy, 
+	bCACValid=> bCACValid, 
+	bCACInvalid=> bCACInvalid, 
+	bCheckDuplicates=> bCheckDuplicates, 
+	bReadyToValidate=> bReadyToValidate, 
+	sRejectCode=> sRejectCode_tests, 
+	sCaseContent=> sCaseContent_tests);
+
+
+
+	
+AssertEquals_BOOL( Expected	:= TRUE,
+			 	   Actual	:= bCACValid, 
+			 	   Message	:= 'bCACValid wrong value');
+						
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="main03_bCACInvalidFalseOnValidData" Id="{87573af4-0616-4952-ace7-bcc41f331fd2}" FolderPath="01.Main\">
+      <Declaration><![CDATA[METHOD INTERNAL main03_bCACInvalidFalseOnValidData
+VAR
+	fbCase_tests		: FB_CASE_FinaliseData;
+	
+	bDoorReject			: BOOL;	
+	bDone 				: BOOL;
+	bBusy				: BOOL;
+
+	bCACValid			: BOOL;
+	bCACInvalid			: BOOL;
+
+	bCheckDuplicates	: BOOL;
+	bReadyToValidate	: BOOL;
+		
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//Data initialization
+TestInit(stCACData:= stCACData_tests, stProductInstruction:= stProductInstruction_tests);
+
+//Change some data for test scenario below
+
+
+	
+TcUnit.TEST('main03_bCACInvalidFalseOnValidData');
+
+fbCase_tests(
+	bExecute:= TRUE, 
+	bDoorReject:= bDoorReject, 
+	stDoorGuardReject:= stCaseRejectReasons_tests.stDoorGuardReject, 
+	stProductInstruction:= stProductInstruction_tests, 
+	stCodeInfo_Outer:= stCodeInfo_Outer_tests, 
+	stCACData:= stCACData_tests, 
+	stCACDataHMI:= stCACDataHMI_tests, 
+	bDone=> bDone, 
+	bBusy=> bBusy, 
+	bCACValid=> bCACValid, 
+	bCACInvalid=> bCACInvalid, 
+	bCheckDuplicates=> bCheckDuplicates, 
+	bReadyToValidate=> bReadyToValidate, 
+	sRejectCode=> sRejectCode_tests, 
+	sCaseContent=> sCaseContent_tests);
+
+
+
+	
+AssertEquals_BOOL( Expected	:= FALSE,
+			 	   Actual	:= bCACInvalid, 
+			 	   Message	:= 'bCACInvalid wrong value');
 						
 
 TEST_FINISHED();]]></ST>
@@ -103,38 +424,32 @@ VAR
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-stProductInstruction.nOutersPerCase		:= 50;
-stProductInstruction.nPacksPerOuter 	:= 10;
-
 	FOR iOuter := 1 TO stProductInstruction.nOutersPerCase DO
-		(* Ustaw outer *)
-		stCACData.Outer[iOuter].Barcode    := CONCAT('OUTER', INT_TO_STRING(iOuter));
+		(* Outer number z zerami *)
+		sOuterNum := F_StringAddPrefix(INT_TO_STRING(iOuter),2,'0');
+		
+		(* Write Outers barcodes *)
+		stCACData.Outer[iOuter].Barcode    := CONCAT('OUTER', sOuterNum);
 		stCACData.Outer[iOuter].OuterCodeStatus := 5;
+		stCACData.Outer[iOuter].OuterRejectCode := 'OK';
 		
 		FOR iPack := 1 TO stProductInstruction.nPacksPerOuter DO
-			(* Pack number z zerami *)
-			sPackNum := CONCAT('0', INT_TO_STRING(iPack));  (* dla 1-9: '01'-'09' *)
-			IF iPack = 10 THEN
-				sPackNum := '10';
-			END_IF;
-			
-			(* Outer number z zerami dla 1-9 *)
-			sOuterNum := CONCAT('0', INT_TO_STRING(iOuter));
-			IF iOuter >= 10 THEN
-				sOuterNum := INT_TO_STRING(iOuter);
-			END_IF;
-			
+			(* Pack number dwucyfrowy z zerami *)
+			sPackNum := F_StringAddPrefix(INT_TO_STRING(iPack),2,'0');			
 			(* Sklej pack code *)
 			sPackCode := CONCAT(CONCAT('PACK', sPackNum), CONCAT('OUTER', sOuterNum));
 			
-			(* Przypisz *)
+			(* Write Pack Barcodes / Data*)
 			stCACData.Outer[iOuter].PackCode[iPack]			:= sPackCode;
 			stCACData.Outer[iOuter].PackCodeStatus[iPack]	:= 5;
-			stCACData.Outer[iOuter].PackRejectID[iPack]		:= 0;
+			stCACData.Outer[iOuter].PackRejectID[iPack]		:= 0;			
+			stCACData.Outer[iOuter].PackRejectCode[iPack]	:= 'OK';
+			
+						
+			stCACData.Outer[iOuter].NumberOfPacks := stProductInstruction.nPacksPerOuter;
 			
 		END_FOR;
-	END_FOR;	
-]]></ST>
+	END_FOR;	]]></ST>
       </Implementation>
     </Method>
   </POU>
