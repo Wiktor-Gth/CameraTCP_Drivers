@@ -17,7 +17,7 @@ VAR
 	(* Inputs *)
 	bExecute 				: BOOL;		(* set TRUE to move Outers *)
 	bDoorReject				: BOOL;
-	stRejectReasonsForCase	: ST_RejectReasonsForCase; //inicjalizacja rejectResonow
+	stRejectReasonsForCase	: ST_RejectReasonsForCase;
 	
 	(* In/Out *)
 	stProductInstruction	: ST_PCM_Status;
@@ -512,15 +512,7 @@ stCACData.CaseRejectCode						:= 'OK';
 stCodeInfo_Outer.nEntireLength					:= 7;
 stCodeInfo_Outer.stSerialCode.nCodeStartPos 	:= 1;
 stCodeInfo_Outer.stSerialCode.nCodeLength 		:= 7;
-
-(* opcje do testowania *)
-//stCACData.Barcode					:= 'Barcode';
-//bDoorReject						:= true/false;	
-//stCACData.CaseRejectCode			:= 'OK' or '';
-//stCACDataHMI.nNumberOfPacks ma byc rowny stProductInstruction.nPacksPerOuter;
-// sprawdzac wartosc stCACDataHMI.aOuter[nOuterIndex].sBarcode = concat z numerami na koncu
-// w zaleznoci jaka wartosc OuterRejectCode / linia 47 bloku
-// sprawdzic warunek ze jak ma byc bCACValid albo bCACInvalid
+stCACData.Barcode 								:= 'CaseBarcode';
 	
 END_IF
 

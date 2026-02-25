@@ -5,16 +5,23 @@
 VAR
 	fbCase_InitialiseData		: FB_CASE_InitialiseData;
 	
-	(* Iterator for Init function/method *)
+	(* Init function/method declarations*)
+	rTrigDataInit		: R_TRIG;
+	bDataInit			: BOOL;
+	iOuter				: INT;
+	iPack				: INT;
+	sPackNum			: STRING;
+	sOuterNum			: STRING;
+	sPackCode			: STRING;
+	
+	// old variables
 	nOuterIndex				: INT;
 	nPackIndex				: INT;
-	rTrigDataInit			: R_TRIG;
-	bDataInit				: BOOL;
 	
 	(* Inputs *)	
 	bExecute 				: BOOL;	(* set TRUE to move Outers *)
 	stCTDateTime			: ST_SYSTEM_DateTime;
-	stDoorGuardReject		: ST_RejectItems;
+	stRejectReasonsForCase	: ST_RejectReasonsForCase;
 	
 	
 	(* In/Out *)
@@ -50,7 +57,7 @@ END_VAR
                   <v n="OutCommented">false</v>
                   <l2 n="NetworkItems" cet="BoxTreeBox">
                     <o>
-                      <v n="BoxType">"Init"</v>
+                      <v n="BoxType">"Init_new"</v>
                       <o n="Instance" t="Operand">
                         <n n="Operand" />
                         <v n="Type">""</v>
@@ -65,7 +72,7 @@ END_VAR
                         <v n="LValue">false</v>
                         <v n="Boolean">false</v>
                         <v n="IsInstance">true</v>
-                        <v n="Id">57L</v>
+                        <v n="Id">61L</v>
                       </o>
                       <o n="OutputItems" t="OutputItemList">
                         <l2 n="OutputItems" />
@@ -91,7 +98,7 @@ END_VAR
                       <n n="STSnippet" />
                       <v n="ContainsExtensibleInputs">false</v>
                       <v n="ProvidesSTSnippet">false</v>
-                      <v n="Id">58L</v>
+                      <v n="Id">62L</v>
                     </o>
                   </l2>
                   <l2 n="Connectors" />
@@ -283,7 +290,7 @@ END_VAR
                           </o>
                           <o>
                             <o n="Operand" t="Operand">
-                              <v n="Operand">"stDoorGuardReject"</v>
+                              <v n="Operand">"stRejectReasonsForCase.stDoorGuardReject"</v>
                               <v n="Type">"ST_RejectItems"</v>
                               <v n="Comment">""</v>
                               <v n="SymbolComment">""</v>
@@ -450,6 +457,67 @@ IF rTrigDataInit.Q THEN
 			END_IF
 			stCACData.Outer[nOuterIndex].PackCodeStatus[nPackIndex].5 	:= TRUE;
 			stCACData.Outer[nOuterIndex].PackRejectCode[nPackIndex]		:= 'OK';
+		END_FOR
+	END_FOR	
+	
+	stCACData.Outer[3].OuterCodeStatus.5 	:= TRUE;
+	stCACData.Outer[4].OuterCodeStatus.5	:= TRUE;
+	
+END_IF
+]]></ST>
+      </Implementation>
+    </Action>
+    <Action Name="Init_new" Id="{bb6cbe2d-2a6c-4382-84c2-14eb265d8296}">
+      <Implementation>
+        <ST><![CDATA[
+rTrigDataInit(CLK := bDataInit);
+
+IF rTrigDataInit.Q THEN
+	
+	MEMSET(ADR(stCACData), 16#00, SIZEOF(stCACData));	
+	
+	stProductInstruction.nOutersPerCase 	:= 50;
+	stProductInstruction.nPacksPerOuter		:= 10;
+	stProductInstruction.nOpMode			:= 11;
+	stProductInstruction.sRetailSKU			:= '1234567';
+	stProductInstruction.nAcceptanceLevel 	:= 10;
+
+
+	stCACData.NumberOfOuters			:= stProductInstruction.nOutersPerCase;
+	stCACData.CodingAndTrackingMode		:= stProductInstruction.nOpMode;
+	stCACData.RetailSKU					:= stProductInstruction.sRetailSKU;
+
+	FOR iOuter := 1 TO stProductInstruction.nOutersPerCase DO
+		(* Outer number z zerami *)
+		sOuterNum := F_StringAddPrefix(INT_TO_STRING(iOuter),2,'0');
+	
+		stCACData.Outer[iOuter].Barcode    				:= CONCAT('OUTER', sOuterNum);
+		stCACData.Outer[iOuter].NumberOfPacks 			:= stProductInstruction.nPacksPerOuter;
+		stCACData.Outer[iOuter].NumberOfLinkedPacks 	:= stProductInstruction.nPacksPerOuter;
+		stCACData.Outer[iOuter].AcceptanceLevel 		:= stProductInstruction.nAcceptanceLevel;
+		stCACData.Outer[iOuter].CodingAndTrackingMode	:= stProductInstruction.nOpMode;
+		stCACData.Outer[iOuter].OuterRejectCode			:= 'OK';
+	
+		FOR iPack := 1 TO stProductInstruction.nPacksPerOuter DO
+			(* Pack number dwucyfrowy z zerami *)
+			sPackNum := F_StringAddPrefix(INT_TO_STRING(iPack),2,'0');			
+			(* Sklej pack code *)
+			sPackCode := CONCAT(CONCAT('PACK', sPackNum), CONCAT('OUTER', sOuterNum));
+			
+			(* Write Pack Barcodes / Data*)
+			stCACData.Outer[iOuter].PackCode[iPack]				:= sPackCode;
+			stCACData.Outer[iOuter].PackCodeStatus[iPack]		:= 5;
+			stCACData.Outer[iOuter].PackRejectID[iPack]			:= 0;			
+			stCACData.Outer[iOuter].PackRejectCode[iPack]		:= 'OK';			
+			stCACData.Outer[iOuter].PackCodeStatus[iPack].5 	:= TRUE;
+			
+			
+			IF iPack = 1 THEN
+				stCACData.Outer[iOuter].AggregationCodes[1]	:= stCACData.Outer[iOuter].PackCode[iPack];
+			END_IF
+			IF iPack = 2 THEN
+				stCACData.Outer[iOuter].AggregationCodes[2]	:= stCACData.Outer[iOuter].PackCode[iPack];
+			END_IF
 		END_FOR
 	END_FOR	
 	

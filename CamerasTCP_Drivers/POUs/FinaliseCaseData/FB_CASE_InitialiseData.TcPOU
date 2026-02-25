@@ -48,7 +48,7 @@ IF rtExecute.Q THEN
 	(* product and machine info *)
 	stCACData.RetailSKU 				:= stProductInstruction.sRetailSKU;    (*sCPIData.RetailSKU;*)
 	stCACData.CasePacker.ProductionSite := stProductInstruction.sProductionSite; (*sCPIData.ProductionSite  ;*)
-	stCACData.CasePacker.ProductionLine :=stProductInstruction.sProductionLine;  (*   sCPIData.ProductionLine;*)
+	stCACData.CasePacker.ProductionLine := stProductInstruction.sProductionLine;  (*   sCPIData.ProductionLine;*)
 	stCACData.CodingAndTrackingMode 	:= stProductInstruction.nOpMode;  (*STRING_TO_INT(sCPIData.CodingAndTrackingMode);*)
 
 	(* PassThrough, PrePrintedLabel or PrintApply mode active *)

@@ -1419,7 +1419,8 @@ VAR
 	sPackCode			: STRING;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
+        <ST><![CDATA[MEMSET(ADR(stCACData), 16#00, SIZEOF(stCACData));	
+
 FOR iOuter := 1 TO stProductInstruction.nOutersPerCase DO
 		(* Outer number z zerami *)
 		sOuterNum := F_StringAddPrefix(INT_TO_STRING(iOuter),2,'0');
