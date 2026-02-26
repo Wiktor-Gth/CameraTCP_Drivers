@@ -23,9 +23,10 @@ main01_OuterCodeStatus5_NegativeNumberOfOuters();
 main02_CaseRejectWrongValuenOpModeBelow6();
 main03_DoorRejectIDstatusValueTrue();
 main04_CaseRejectWrongValuenOpModeAbove6();
+main05_bDoorRejectWrongValueOnDoorReject();
 
 //==============================================================
-//02.CaseContenr	
+//02.MasterListCounter
 //==============================================================
 masterListCounter01_MasterListRestoredCounterWrongNumber01();
 masterListCounter02_MasterListRestoredCounterWrongNumber02();
@@ -227,6 +228,52 @@ TcUnit.TEST('main04_CaseRejectWrongValuenOpModeAbove6');
 	AssertEquals_STRING(Expected := TO_STRING(sRejectCodeTemp),
                     Actual := TO_STRING(sRejectCode_tests),
                     Message := 'Values of CaseRejectCode differ');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="main05_bDoorRejectWrongValueOnDoorReject" Id="{886b4cef-8cf7-481b-9406-962c5e0e71a9}" FolderPath="01.Main\">
+      <Declaration><![CDATA[METHOD INTERNAL main05_bDoorRejectWrongValueOnDoorReject
+VAR
+	fbCaseTest				: FB_CASE_InitialiseData;	
+	
+	bDone_test					: BOOL;
+	bBussy_test					: BOOL;
+	bDoorReject_test			: BOOL;
+	nMasterListCounter_test		: INT;
+	bCheckDuplicate_test		: BOOL;
+	
+	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+TestInit(stProductInstruction_tests,stCACData_tests);
+
+//Change some data for test scenario below
+stCACData_tests.CaseRejectID := stRejectReasonsForCase_tets.stDoorGuardReject.nRejectID;
+
+
+fbCaseTest(
+	bExecute:= TRUE, 
+	stCTDateTime:= stCTDateTime_tests, 
+	stDoorGuardReject:= stRejectReasonsForCase_tets.stDoorGuardReject, 
+	stProductInstruction:= stProductInstruction_tests, 
+	stCACData:= stCACData_tests, 
+	bDone=> bDone_test, 
+	bBusy=> bBussy_test, 
+	bDoorReject=> bDoorReject_test, 
+	sRejectCode=> sRejectCode_tests, 
+	nMasterListCounter=> nMasterListCounter_test, 
+	bCheckDuplicates=> bCheckDuplicate_test
+	
+	);
+
+TcUnit.TEST('main05_bDoorRejectWrongValueOnDoorReject');
+
+	AssertEquals_BOOL(Expected  := TRUE,
+                  	  Actual 	:= bDoorReject_test,
+                   	  Message 	:= 'bDoorReject wrong value');
 
 TEST_FINISHED();]]></ST>
       </Implementation>

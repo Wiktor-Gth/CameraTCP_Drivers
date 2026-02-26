@@ -3,9 +3,9 @@
   <POU Name="PRG_TEST" Id="{57de771e-4346-4079-9379-3645d39749ca}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM PRG_TEST
 VAR
-	fbCaseDuplicatCheckTests			: FB_CASE_DuplicatCheckTests;
+	//fbCaseDuplicatCheckTests			: FB_CASE_DuplicatCheckTests;
 	//fbCaseDuplicateUpdateToDBTests	: FB_CASE_DuplicateUpdateToDBTests;
-	fbCaseFinaliseDataTests				: FB_CASE_FinaliseDataTests;
+	//fbCaseFinaliseDataTests				: FB_CASE_FinaliseDataTests;
 	fbCaseInitialiseData_Test 			: FB_CASE_InitialiseDataTests;
 	//fbCaseValidateContentTests		: FB_CASE_ValidateContentTests;
 	
