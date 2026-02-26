@@ -67,7 +67,7 @@ Connect();
 
 Receive();
 
-//Send();
+	//Send();
 
 Send_Sequence();
 
@@ -124,14 +124,14 @@ IF fbTCPReceive.bDataReceived THEN
 	nIndex := nIndex + 1;
 	strTCPRxString := '';
 END_IF
-	
+// zeroj tablice otrzymanych stringow	
 IF nIndex = 20 THEN
 	nIndex := 0;
 	FOR nIndex2 := 0 TO 20 DO
 		GVL.aTCPxStrings[nIndex2] := '';		
 	END_FOR
 END_IF
-
+// zeroj tablice odpowiedzi na porcie send
 IF nIndexReply = 20 THEN
 	nIndexReply := 0;
 	FOR nIndex2 := 0 TO 20 DO
@@ -251,7 +251,7 @@ IF rTrigDataReceived.Q THEN
 	
 END_IF
 
-// HeartBeat send every tHeartbeatInterval, if heartbead doesent reply do bReInitialiseTCP := TRUE
+//HeartBeat send every tHeartbeatInterval, IF heartbead doesent reply DO bReInitialiseTCP := TRUE
 fbTON_TcpTimeout(
 	IN	:= fbTCPortCtrl_Send.bConnected,
  	PT	:= tHeartbeatInterval

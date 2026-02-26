@@ -16,6 +16,7 @@
     <Implicit_KindOfTask>{0ae93d8d-2076-4528-93f6-c00a2ab4daf6}</Implicit_KindOfTask>
     <Implicit_Jitter_Distribution>{246b981d-fe2a-4839-9782-c55221277b9e}</Implicit_Jitter_Distribution>
     <LibraryReferences>{ebe1cb54-1db0-4f0a-895b-c53fe8e647d5}</LibraryReferences>
+    <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DUTs\E_TCPIP_RequescCommand.TcDUT">

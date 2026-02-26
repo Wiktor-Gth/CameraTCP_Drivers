@@ -13,13 +13,13 @@ END_VAR
 //fbSiemensCameraMV5xCtrl();
 
 //PRG_Test();
-//PRG_ButtonsHandler();
+PRG_ButtonsHandler();
 
 //IO_logic();
 
-//fbHikrobotScannerCtrl();
+fbHikrobotScannerCtrl();
 
-Outer_IN_Case_Duplicat();]]></ST>
+//Outer_IN_Case_Duplicat();]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>

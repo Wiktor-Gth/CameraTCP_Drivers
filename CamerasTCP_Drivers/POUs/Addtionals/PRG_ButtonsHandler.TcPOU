@@ -7,11 +7,17 @@ VAR
 	tTimer			: TOF;
 	tTriggerTime	: TIME := T#100MS;
 	bTimerOn		: BOOL;
+	iIteration		: INT;
+	
+	fbTON			: TON;
+	fbTOF			: TOF;
+	bOut			: BOOL;
+	bEnable			: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[
-rTrig(CLK:= GVL.bSiemensTriggerButton);
+rTrig(CLK:= GVL.bTriggerButton);
 
 tTimer(IN:= bTimerOn, PT:= tTriggerTime);
 
@@ -21,7 +27,39 @@ ELSIF tTimer.ET = T#0S THEN
 	bTimerOn := FALSE;
 END_IF
 
-GVL.bSiemensTriggerOutput := tTimer.Q;
+//petla strzelania 10 fotek
+
+
+fbTON(IN := NOT bOut, PT := T#200MS);
+fbTOF(IN := bOut, PT := T#100MS); 
+
+IF rTrig.Q THEN
+	bEnable := TRUE;
+END_IF
+
+IF bEnable THEN
+	IF fbTON.Q THEN                // Po 500 ms OFF -> załącz
+		bOut := TRUE;
+		iIteration := iIteration + 1;
+	ELSIF fbTOF.Q THEN             // Po 100 ms ON -> wyłącz
+		bOut := FALSE;
+	END_IF
+	
+	IF iIteration > 5 THEN
+		iIteration 	:= 0;
+		bEnable		:= FALSE;
+	END_IF
+	
+ELSE
+	bOut := FALSE;   
+	// Reset przy wyłączonym
+END_IF
+
+GVL.bTriggerOutput := bOut;	
+
+
+
+//GVL.bTriggerOutput := tTimer.Q;
 
 
 
