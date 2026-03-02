@@ -133,9 +133,7 @@ fbCaseTest(
 	bError=> bError, 
 	nErrorID=> nErrorID, 
 	sRejectCode=> sRejectCode_tets, 
-	nValidationIndex=> nValidationIndex,
-	eLastState => eLastState,
-	bTestFB => bTestFB
+	nValidationIndex=> nValidationIndex
 );
 
 CycleCounter := CycleCounter + 1;
