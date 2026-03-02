@@ -56,7 +56,7 @@ END_VAR
                   <v n="OutCommented">false</v>
                   <l2 n="NetworkItems" cet="BoxTreeBox">
                     <o>
-                      <v n="BoxType">"Init"</v>
+                      <v n="BoxType">"Init_new"</v>
                       <o n="Instance" t="Operand">
                         <n n="Operand" />
                         <v n="Type">""</v>
@@ -71,7 +71,7 @@ END_VAR
                         <v n="LValue">false</v>
                         <v n="Boolean">false</v>
                         <v n="IsInstance">true</v>
-                        <v n="Id">36L</v>
+                        <v n="Id">42L</v>
                       </o>
                       <o n="OutputItems" t="OutputItemList">
                         <l2 n="OutputItems" />
@@ -97,7 +97,7 @@ END_VAR
                       <n n="STSnippet" />
                       <v n="ContainsExtensibleInputs">false</v>
                       <v n="ProvidesSTSnippet">false</v>
-                      <v n="Id">37L</v>
+                      <v n="Id">43L</v>
                     </o>
                   </l2>
                   <l2 n="Connectors" />
@@ -461,19 +461,34 @@ END_VAR
     </Implementation>
     <Action Name="Init" Id="{a36de12f-b054-405c-a8cb-ac1230cd4e58}">
       <Implementation>
-        <ST><![CDATA[
-rTrigDataInit(CLK := bDataInit);
+        <ST><![CDATA[rTrigDataInit(CLK := bDataInit);
 
 IF rTrigDataInit.Q THEN
-	
-stProductInstruction.nOutersPerCase		:= 50;
-stProductInstruction.nPacksPerOuter 	:= 10;
+		
+	stProductInstruction.nOutersPerCase		:= 50;
+	stProductInstruction.nPacksPerOuter 	:= 10;
+
+
+
+
+
+
+
+
+
+
 
 	FOR iOuter := 1 TO stProductInstruction.nOutersPerCase DO
 		(* Ustaw outer *)
 		stCACData.Outer[iOuter].Barcode    := CONCAT('OUTER', INT_TO_STRING(iOuter));
 		stCACData.Outer[iOuter].OuterCodeStatus := 5;
 		
+
+
+
+
+
+
 		FOR iPack := 1 TO stProductInstruction.nPacksPerOuter DO
 			(* Pack number z zerami *)
 			sPackNum := CONCAT('0', INT_TO_STRING(iPack));  (* dla 1-9: '01'-'09' *)
@@ -494,9 +509,87 @@ stProductInstruction.nPacksPerOuter 	:= 10;
 			stCACData.Outer[iOuter].PackCode[iPack]			:= sPackCode;
 			stCACData.Outer[iOuter].PackCodeStatus[iPack]	:= 5;
 			stCACData.Outer[iOuter].PackRejectID[iPack]		:= 0;
+
+
 			
 		END_FOR;
 	END_FOR;	
+
+
+
+
+
+
+
+
+
+
+	
+END_IF
+]]></ST>
+      </Implementation>
+    </Action>
+    <Action Name="Init_new" Id="{907ed0a9-63d3-498c-b872-2e22bfbcd3c4}">
+      <Implementation>
+        <ST><![CDATA[
+rTrigDataInit(CLK := bDataInit);
+
+IF rTrigDataInit.Q THEN
+	
+	MEMSET(ADR(stCACData), 16#00, SIZEOF(stCACData));	
+	
+	stProductInstruction.nOutersPerCase 	:= 50;
+	stProductInstruction.nPacksPerOuter		:= 10;	
+	// jezeli tej wartosci nie ma, jest na 0 i czytaj ponizej
+	stProductInstruction.nPacksPerCase		:= 500;
+	stProductInstruction.nOpMode			:= 11;
+	stProductInstruction.sRetailSKU			:= '1234567';
+	stProductInstruction.nAcceptanceLevel 	:= 10;
+
+	// jezeli stCACData.NumberOfOuters=0 , czyli usune te linie ponizej to nie wejdzie do warunku linia 40 FB_CASE_ValidateContent i wywali
+	// jakis error z elsifa ktoregos
+	stCACData.NumberOfOuters			:= stProductInstruction.nOutersPerCase;
+	stCACData.CodingAndTrackingMode		:= stProductInstruction.nOpMode;
+	stCACData.RetailSKU					:= stProductInstruction.sRetailSKU;
+
+	FOR iOuter := 1 TO stProductInstruction.nOutersPerCase DO
+		(* Outer number z zerami *)
+		sOuterNum := F_StringAddPrefix(INT_TO_STRING(iOuter),2,'0');
+	
+		stCACData.Outer[iOuter].Barcode    				:= CONCAT('OUTER', sOuterNum);
+		stCACData.Outer[iOuter].NumberOfPacks 			:= stProductInstruction.nPacksPerOuter;
+		stCACData.Outer[iOuter].NumberOfLinkedPacks 	:= stProductInstruction.nPacksPerOuter;
+		stCACData.Outer[iOuter].AcceptanceLevel 		:= stProductInstruction.nAcceptanceLevel;
+		stCACData.Outer[iOuter].CodingAndTrackingMode	:= stProductInstruction.nOpMode;
+		stCACData.Outer[iOuter].OuterRejectCode			:= 'OK';
+	
+		FOR iPack := 1 TO stProductInstruction.nPacksPerOuter DO
+			(* Pack number dwucyfrowy z zerami *)
+			sPackNum := F_StringAddPrefix(INT_TO_STRING(iPack),2,'0');			
+			(* Sklej pack code *)
+			sPackCode := CONCAT(CONCAT('PACK', sPackNum), CONCAT('OUTER', sOuterNum));
+			
+			(* Write Pack Barcodes / Data*)
+			stCACData.Outer[iOuter].PackCode[iPack]				:= sPackCode;
+			stCACData.Outer[iOuter].PackCodeStatus[iPack]		:= 5;
+			stCACData.Outer[iOuter].PackRejectID[iPack]			:= 0;			
+			stCACData.Outer[iOuter].PackRejectCode[iPack]		:= 'OK';			
+			stCACData.Outer[iOuter].PackCodeStatus[iPack].5 	:= TRUE;
+			
+			
+			IF iPack = 1 THEN
+				stCACData.Outer[iOuter].AggregationCodes[1]	:= stCACData.Outer[iOuter].PackCode[iPack];
+			END_IF
+			IF iPack = 2 THEN
+				stCACData.Outer[iOuter].AggregationCodes[2]	:= stCACData.Outer[iOuter].PackCode[iPack];
+			END_IF
+		END_FOR
+	END_FOR	
+	
+	stCACData.Outer[3].OuterCodeStatus.5 	:= TRUE;
+	stCACData.Outer[4].OuterCodeStatus.5	:= TRUE;
+	
+	stCACData.NumberOfOuters 				:= 55;
 	
 END_IF
 ]]></ST>

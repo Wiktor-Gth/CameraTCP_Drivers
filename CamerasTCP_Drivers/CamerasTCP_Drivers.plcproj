@@ -1429,7 +1429,9 @@
     <Folder Include="POUs\_Utilites\TCP_FB" />
     <Folder Include="POUs\_Utilites\Tests" />
     <Folder Include="VISUs" />
-    <Folder Include="POUs" />
+    <Folder Include="POUs">
+      <ExcludeFromBuild>false</ExcludeFromBuild>
+    </Folder>
   </ItemGroup>
   <ItemGroup>
     <PlaceholderReference Include="Tc2_SerialCom">

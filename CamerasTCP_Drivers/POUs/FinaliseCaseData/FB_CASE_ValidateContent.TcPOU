@@ -22,10 +22,14 @@ VAR_OUTPUT
 
 	sRejectCode					: T_MaxString;
 	nValidationIndex			: INT;
+	
+	//temp for tests
+	eLastState					: E_CAC_STATE;
+	bTestFB						: BOOL;
 
 END_VAR
 VAR
-	fbExecute						: R_TRIG;
+	fbExecute					: R_TRIG;
 	eState						: E_CAC_STATE;
 	eErrorState					: E_CAC_STATE;
 
@@ -513,6 +517,9 @@ CASE eState OF
 	(* complete *)
 	E_CAC_DONE:
 
+		
+	
+		bTestFB := TRUE;
 		(* no error found *)
 		IF bError = FALSE THEN
 
@@ -538,7 +545,11 @@ ELSE
 	bBusy := FALSE;
 	bError := FALSE;
 
-END_CASE]]></ST>
+END_CASE
+
+// for test purpose
+eLastState := eState;
+//bTestFB := bDone;]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>
