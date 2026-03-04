@@ -18,6 +18,10 @@ VAR
 	(* Inputs *)
 	bExecute 					: BOOL;
 	stCTDateTime				: ST_SYSTEM_DateTime;	(* CaseTrace date/time structure *)
+	bIsDuplicateOuters			: BOOL;
+	bIsDuplicatePacks			: BOOL;
+	stOuterDataNotFound			: ST_RejectItems;
+	stRejectReasonsForOuter		: ST_RejectReasonsForOuter;
 	
 	(* In/Out *)
 	stProductInstruction		: ST_PCM_Status;
@@ -155,7 +159,7 @@ END_VAR
                           <v n="LValue">false</v>
                           <v n="Boolean">false</v>
                           <v n="IsInstance">true</v>
-                          <v n="Id">31L</v>
+                          <v n="Id">46L</v>
                         </o>
                         <o n="OutputItems" t="OutputItemList">
                           <l2 n="OutputItems" cet="Operand">
@@ -270,8 +274,8 @@ END_VAR
                           </o>
                           <o>
                             <o n="Operand" t="Operand">
-                              <v n="Operand">"stCTDateTime"</v>
-                              <v n="Type">"ST_SYSTEM_DateTime"</v>
+                              <v n="Operand">"bIsDuplicateOuters"</v>
+                              <v n="Type">"BOOL"</v>
                               <v n="Comment">""</v>
                               <v n="SymbolComment">""</v>
                               <v n="Address">""</v>
@@ -289,8 +293,8 @@ END_VAR
                           </o>
                           <o>
                             <o n="Operand" t="Operand">
-                              <v n="Operand">"stProductInstruction"</v>
-                              <v n="Type">"ST_PCM_Status"</v>
+                              <v n="Operand">"bIsDuplicatePacks"</v>
+                              <v n="Type">"BOOL"</v>
                               <v n="Comment">""</v>
                               <v n="SymbolComment">""</v>
                               <v n="Address">""</v>
@@ -308,8 +312,8 @@ END_VAR
                           </o>
                           <o>
                             <o n="Operand" t="Operand">
-                              <v n="Operand">"nSecquentionalCounter"</v>
-                              <v n="Type">"UDINT"</v>
+                              <v n="Operand">"stCTDateTime"</v>
+                              <v n="Type">"ST_SYSTEM_DateTime"</v>
                               <v n="Comment">""</v>
                               <v n="SymbolComment">""</v>
                               <v n="Address">""</v>
@@ -327,8 +331,8 @@ END_VAR
                           </o>
                           <o>
                             <o n="Operand" t="Operand">
-                              <v n="Operand">"stCodeInfo_Outer"</v>
-                              <v n="Type">"ST_CodeInfo"</v>
+                              <v n="Operand">"stRejectReasonsForOuter.stOuterDataNotFound"</v>
+                              <v n="Type">"ST_RejectItems"</v>
                               <v n="Comment">""</v>
                               <v n="SymbolComment">""</v>
                               <v n="Address">""</v>
@@ -346,8 +350,8 @@ END_VAR
                           </o>
                           <o>
                             <o n="Operand" t="Operand">
-                              <v n="Operand">"stCaseRejectReasons"</v>
-                              <v n="Type">"ST_RejectReasonsForCase"</v>
+                              <v n="Operand">"stProductInstruction"</v>
+                              <v n="Type">"ST_PCM_Status"</v>
                               <v n="Comment">""</v>
                               <v n="SymbolComment">""</v>
                               <v n="Address">""</v>
@@ -365,8 +369,8 @@ END_VAR
                           </o>
                           <o>
                             <o n="Operand" t="Operand">
-                              <v n="Operand">"stCACData"</v>
-                              <v n="Type">"ST_CAC_Data"</v>
+                              <v n="Operand">"nSecquentionalCounter"</v>
+                              <v n="Type">"UDINT"</v>
                               <v n="Comment">""</v>
                               <v n="SymbolComment">""</v>
                               <v n="Address">""</v>
@@ -382,11 +386,71 @@ END_VAR
                             </o>
                             <v n="Id">29L</v>
                           </o>
+                          <o>
+                            <o n="Operand" t="Operand">
+                              <v n="Operand">"stCodeInfo_Outer"</v>
+                              <v n="Type">"ST_CodeInfo"</v>
+                              <v n="Comment">""</v>
+                              <v n="SymbolComment">""</v>
+                              <v n="Address">""</v>
+                              <o n="Flags" t="Flags">
+                                <v n="Flags">0</v>
+                                <v n="Fixed">false</v>
+                                <v n="Extensible">false</v>
+                              </o>
+                              <v n="LValue">false</v>
+                              <v n="Boolean">false</v>
+                              <v n="IsInstance">false</v>
+                              <v n="Id">49L</v>
+                            </o>
+                            <v n="Id">48L</v>
+                          </o>
+                          <o>
+                            <o n="Operand" t="Operand">
+                              <v n="Operand">"stCaseRejectReasons"</v>
+                              <v n="Type">"ST_RejectReasonsForCase"</v>
+                              <v n="Comment">""</v>
+                              <v n="SymbolComment">""</v>
+                              <v n="Address">""</v>
+                              <o n="Flags" t="Flags">
+                                <v n="Flags">0</v>
+                                <v n="Fixed">false</v>
+                                <v n="Extensible">false</v>
+                              </o>
+                              <v n="LValue">false</v>
+                              <v n="Boolean">false</v>
+                              <v n="IsInstance">false</v>
+                              <v n="Id">51L</v>
+                            </o>
+                            <v n="Id">50L</v>
+                          </o>
+                          <o>
+                            <o n="Operand" t="Operand">
+                              <v n="Operand">"stCACData"</v>
+                              <v n="Type">"ST_CAC_Data"</v>
+                              <v n="Comment">""</v>
+                              <v n="SymbolComment">""</v>
+                              <v n="Address">""</v>
+                              <o n="Flags" t="Flags">
+                                <v n="Flags">0</v>
+                                <v n="Fixed">false</v>
+                                <v n="Extensible">false</v>
+                              </o>
+                              <v n="LValue">false</v>
+                              <v n="Boolean">false</v>
+                              <v n="IsInstance">false</v>
+                              <v n="Id">53L</v>
+                            </o>
+                            <v n="Id">52L</v>
+                          </o>
                         </l2>
                         <o n="InputParam" t="ParamList">
                           <l2 n="Names" cet="String">
                             <v>bExecute</v>
+                            <v>bIsDuplicateOuters</v>
+                            <v>bIsDuplicatePacks</v>
                             <v>stCTDateTime</v>
+                            <v>stOuterDataNotFound</v>
                             <v>stProductInstruction</v>
                             <v>nSecquentionalCounter</v>
                             <v>stCodeInfo_Outer</v>
@@ -395,7 +459,10 @@ END_VAR
                           </l2>
                           <l2 n="Types" cet="String">
                             <v>BOOL</v>
+                            <v>BOOL</v>
+                            <v>BOOL</v>
                             <v>ST_SYSTEM_DateTime</v>
+                            <v>ST_RejectItems</v>
                             <v>ST_PCM_Status[REF]</v>
                             <v>UDINT[REF]</v>
                             <v>ST_CodeInfo[REF]</v>
@@ -427,7 +494,7 @@ END_VAR
                         <n n="STSnippet" />
                         <v n="ContainsExtensibleInputs">false</v>
                         <v n="ProvidesSTSnippet">false</v>
-                        <v n="Id">32L</v>
+                        <v n="Id">47L</v>
                       </o>
                       <v n="Id">34L</v>
                     </o>
