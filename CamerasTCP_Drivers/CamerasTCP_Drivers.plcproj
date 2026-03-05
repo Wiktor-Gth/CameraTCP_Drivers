@@ -16,6 +16,7 @@
     <Implicit_KindOfTask>{0ae93d8d-2076-4528-93f6-c00a2ab4daf6}</Implicit_KindOfTask>
     <Implicit_Jitter_Distribution>{246b981d-fe2a-4839-9782-c55221277b9e}</Implicit_Jitter_Distribution>
     <LibraryReferences>{ebe1cb54-1db0-4f0a-895b-c53fe8e647d5}</LibraryReferences>
+    <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DUTs\E_TCPIP_RequescCommand.TcDUT">
@@ -1142,6 +1143,9 @@
     <Compile Include="DUTs\Test_DUTs\ST_DuplicateInfo.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DUTs\Test_DUTs\ST_FBinside.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DUTs\Test_DUTs\ST_LAB_CaseData.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -1171,6 +1175,12 @@
       <LinkAlways>true</LinkAlways>
     </Compile>
     <Compile Include="PlcTask.TcTTO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\FBReferenceTest\FB_TimersTEST.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\FBReferenceTest\PRG_Reference_POU.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\FinaliseCaseData\FB_CASE_DuplicatCheck.TcPOU">
@@ -1420,6 +1430,7 @@
     <Folder Include="DUTs\Test_DUTs" />
     <Folder Include="GVLs" />
     <Folder Include="POUs\FinaliseCaseData" />
+    <Folder Include="POUs\FBReferenceTest" />
     <Folder Include="POUs\_Utilites" />
     <Folder Include="POUs\TcUnit" />
     <Folder Include="POUs\TcUnit\FB_CASE_DuplicatCheckTests" />

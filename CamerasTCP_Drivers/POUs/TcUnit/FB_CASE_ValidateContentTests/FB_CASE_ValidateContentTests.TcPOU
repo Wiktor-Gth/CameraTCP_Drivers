@@ -18,9 +18,8 @@ VAR
 
 	stProductInstruction_test_0101		: ST_PCM_Status;
 	stCACData_test_0101 				: ST_CAC_Data;
-	
+		
 	stCACData_tests 					: ST_CAC_Data;
-	
 (* 02.DataConsistancy tests container *)
 	stProductInstruction_test_0201		: ST_PCM_Status;
 	stCACData_test_0201 				: ST_CAC_Data;
@@ -108,7 +107,6 @@ END_VAR]]></Declaration>
 //01.Main
 //==============================================================
 main01_bExecuteFalseNoAction();
-
 //==============================================================
 //02.DataConsistancy
 //==============================================================
@@ -622,6 +620,7 @@ TestInit(stCACData:= stCACData_test_0601, stProductInstruction:= stProductInstru
 TcUnit.TEST('duplicateHandler01_OuterDuplicatebErrorTrue');
 
 
+
 fbCaseTest0601(
 	bExecute:= TRUE, 
 	bIsDuplicateOuters:= TRUE, 
@@ -1089,7 +1088,9 @@ TestInit(stCACData:= stCACData_test_0701, stProductInstruction:= stProductInstru
 
 //Change some data for test scenario below
 stCACData_test_0701.Outer[5].OuterRejectID := 207;
-stProductInstruction_test_0701.nCaseAcceptanceLevelOuters := 50;
+stProductInstruction_test_0701.nCaseAcceptanceLevelOuters := 60;
+stProductInstruction_test_0701.nOuterAcceptanceLevelPacks := 100;
+stProductInstruction_test_0701.nCaseAcceptanceLevelPacks  := 100;
 	
 TcUnit.TEST('oacMissing01nErrorID21');
 
@@ -1141,7 +1142,7 @@ IF rTrig0701.Q THEN
 	
 ELSIF nCycles0701 > 50 THEN
 	
-	AssertTrue(Condition := TRUE,
+	AssertTrue(Condition := FALSE,
 			   Message 	 := 'Timeout oacMissing01nErrorID21'
 	);	 
 	TEST_FINISHED();
