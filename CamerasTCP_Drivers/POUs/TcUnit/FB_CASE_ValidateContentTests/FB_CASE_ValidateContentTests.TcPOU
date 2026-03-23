@@ -1088,7 +1088,8 @@ TestInit(stCACData:= stCACData_test_0701, stProductInstruction:= stProductInstru
 
 //Change some data for test scenario below
 stCACData_test_0701.Outer[5].OuterRejectID := 207;
-stProductInstruction_test_0701.nCaseAcceptanceLevelOuters := 60;
+stCACData_test_0701.Outer[15].OuterRejectID := 207;
+stProductInstruction_test_0701.nCaseAcceptanceLevelOuters := 100;
 stProductInstruction_test_0701.nOuterAcceptanceLevelPacks := 100;
 stProductInstruction_test_0701.nCaseAcceptanceLevelPacks  := 100;
 	

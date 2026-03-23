@@ -38,7 +38,7 @@ VAR
 
 	(*fbValidateCaseLabel				: FB_CODE_ValidateExplicitCode;*)
 	nOutGTIN					: INT;
-	nOutBand					: INT;
+	nOutBrand					: INT;
 	nRetailSKU					: INT;
 	nSerialCode					: INT;
 	nTotalInvalide				: INT;
@@ -161,7 +161,7 @@ CASE eState OF
 				(* reset nNumberOfOuters to 0 and generate reject string *)
 				stCACData.NumberOfOuters := 0;
 
-				aStatusErrorVal[0] 		:= F_StringAddPrefix(INT_TO_STRING(stCACData.NumberOfOuters),2,'0');
+				aStatusErrorVal[0] 		:= INT_TO_STRING(stCACData.NumberOfOuters);
 				aRejectCodePointer[0] 	:= 'nn';
 
 				stCACData.CaseRejectCode 	:= F_CODE_AssignValToStringWithPrefix(stCaseRejectReasons.stValError.sMetsDisplayCode, aStatusErrorVal, aRejectCodePointer, 3, '0');
@@ -177,7 +177,7 @@ CASE eState OF
 				(* reset nNumberOfOuters to 0 and generate reject string *)
 				stCACData.NumberOfOuters := stProductInstruction.nOutersPerCase;
 
-				aStatusErrorVal[0] 		:= F_StringAddPrefix(INT_TO_STRING(stCACData.NumberOfOuters),2,'0');
+				aStatusErrorVal[0] 		:= INT_TO_STRING(stCACData.NumberOfOuters);
 				aRejectCodePointer[0] 	:= 'nn';
 
 				stCACData.CaseRejectCode 	:= F_CODE_AssignValToStringWithPrefix(stCaseRejectReasons.stValError.sMetsDisplayCode, aStatusErrorVal, aRejectCodePointer, 3, '0');
@@ -188,7 +188,7 @@ CASE eState OF
 			(* incorrect number of Outers *)
 			ELSE
 
-				aStatusErrorVal[0] 		:= F_StringAddPrefix(INT_TO_STRING(stCACData.NumberOfOuters),2,'0');
+				aStatusErrorVal[0] 		:= INT_TO_STRING(stCACData.NumberOfOuters);
 				aRejectCodePointer[0] 	:= 'nn';
 
 				stCACData.CaseRejectCode 	:= F_CODE_AssignValToStringWithPrefix(stCaseRejectReasons.stValError.sMetsDisplayCode, aStatusErrorVal, aRejectCodePointer, 3, '0');
@@ -279,7 +279,7 @@ CASE eState OF
 
 			(* generate reject string *)
 
-			aStatusErrorVal[0] 		:= F_StringAddPrefix(INT_TO_STRING(stCACData.NumberOfOuters - nValidOACData),2,'0');
+			aStatusErrorVal[0] 		:= INT_TO_STRING(stCACData.NumberOfOuters - nValidOACData);
 			aRejectCodePointer[0] 	:= 'nn';
 
 			stCACData.CaseRejectCode 	:= F_CODE_AssignValToStringWithPrefix(stCaseRejectReasons.stOACError.sMetsDisplayCode, aStatusErrorVal, aRejectCodePointer, 3, '0');
@@ -294,7 +294,7 @@ CASE eState OF
 
 		(* initialise counters *)
 		nOutGTIN		:= 0;
-		nOutBand		:= 0;
+		nOutBrand		:= 0;
 		nRetailSKU 		:= 0;
 		nSerialCode 	:= 0;
 		nTotalInvalide	:= 0;
@@ -315,7 +315,7 @@ CASE eState OF
 			IF fbValidateOuter.bBrandOK OR stCACData.Outer[nOuterIndex].DataSource =  '3DC'  THEN
 
 				(* Outer has valid GTIN *)
-				nOutBand := nOutBand + 1;
+				nOutBrand := nOutBrand + 1;
 			END_IF
 
 			IF fbValidateOuter.bSerialCodeOK OR stCACData.Outer[nOuterIndex].DataSource =  '3DC'  THEN
@@ -340,7 +340,7 @@ CASE eState OF
 		(* all Outers have valid GTIN *)
 		IF  nOutGTIN = stProductInstruction.nOutersPerCase THEN
 			(* all Outers have valid Brand *)
-			IF  nOutBand = stProductInstruction.nOutersPerCase THEN
+			IF  nOutBrand = stProductInstruction.nOutersPerCase THEN
 				(* all Outers have valid RetailSKU *)
 				IF  nRetailSKU = stProductInstruction.nOutersPerCase  THEN
 					(* all Outers have valid SerialCode *)
@@ -356,7 +356,7 @@ CASE eState OF
 							nErrorID := 31;
 							eErrorState := eState;
 
-							aStatusErrorVal[0] 		:= F_StringAddPrefix(INT_TO_STRING(stCACData.NumberOfOuters - nTotalInvalide),2,'0');
+							aStatusErrorVal[0] 		:=INT_TO_STRING(stCACData.NumberOfOuters - nTotalInvalide);
 							aRejectCodePointer[0] 	:= 'nn';
 						
 							stCACData.CaseRejectCode 	:= F_CODE_AssignValToStringWithPrefix(stCaseRejectReasons.stINVError.sMetsDisplayCode, aStatusErrorVal, aRejectCodePointer, 2, '0');
@@ -375,7 +375,7 @@ CASE eState OF
 	
 						(* generate reject string *)
 	
-						aStatusErrorVal[0] 		:= F_StringAddPrefix(INT_TO_STRING(stCACData.NumberOfOuters - nSerialCode),2,'0');
+						aStatusErrorVal[0] 		:= INT_TO_STRING(stCACData.NumberOfOuters - nSerialCode);
 						aRejectCodePointer[0] 	:= 'nn';
 	
 						stCACData.CaseRejectCode 	:= F_CODE_AssignValToStringWithPrefix(stCaseRejectReasons.stOuterSerialError.sMetsDisplayCode, aStatusErrorVal, aRejectCodePointer, 2, '0');
@@ -395,7 +395,7 @@ CASE eState OF
 		
 					(* generate reject string *)
 	
-					aStatusErrorVal[0] 		:= F_StringAddPrefix(INT_TO_STRING(stCACData.NumberOfOuters - nRetailSKU),2,'0');
+					aStatusErrorVal[0] 		:= INT_TO_STRING(stCACData.NumberOfOuters - nRetailSKU);
 					aRejectCodePointer[0] 	:= 'nn';
 		
 					stCACData.CaseRejectCode 	:= F_CODE_AssignValToStringWithPrefix(stCaseRejectReasons.stOuterRSKUError.sMetsDisplayCode, aStatusErrorVal, aRejectCodePointer, 2, '0');
@@ -412,7 +412,7 @@ CASE eState OF
 	
 				(* generate reject string *)
 
-				aStatusErrorVal[0] 		:= F_StringAddPrefix(INT_TO_STRING(stCACData.NumberOfOuters - nOutBand),2,'0');
+				aStatusErrorVal[0] 		:= INT_TO_STRING(stCACData.NumberOfOuters - nOutBrand);
 				aRejectCodePointer[0] 	:= 'nn';
 	
 				stCACData.CaseRejectCode 	:= F_CODE_AssignValToStringWithPrefix(stCaseRejectReasons.stOuterBrandError.sMetsDisplayCode, aStatusErrorVal, aRejectCodePointer, 2, '0');
@@ -428,7 +428,7 @@ CASE eState OF
 
 			(* generate reject string *)
 
-			aStatusErrorVal[0] 		:= F_StringAddPrefix(INT_TO_STRING(stCACData.NumberOfOuters - nOutGTIN),2,'0');
+			aStatusErrorVal[0] 		:= INT_TO_STRING(stCACData.NumberOfOuters - nOutGTIN);
 			aRejectCodePointer[0] 	:= 'nn';
 
 			stCACData.CaseRejectCode 	:= F_CODE_AssignValToStringWithPrefix(stCaseRejectReasons.stOuterGTINError.sMetsDisplayCode, aStatusErrorVal, aRejectCodePointer, 2, '0');
@@ -528,7 +528,7 @@ CASE eState OF
 
 	
 			// return number of stCACData.Outer[nOuterIndex].PackCodeStatus[nPackIndex].0 packs inside case, like XXXPACKnn
-			aStatusErrorVal[0] 		:= F_StringAddPrefix(INT_TO_STRING(stProductInstruction.nPacksPerCase - nValidPackData),2,'0');
+			aStatusErrorVal[0] 		:=INT_TO_STRING(stProductInstruction.nPacksPerCase - nValidPackData);
 			aRejectCodePointer[0] 	:= 'nn';
 
 			stCACData.CaseRejectCode := F_CODE_AssignValToStringWithPrefix(stCaseRejectReasons.stPackNotLinedError.sMetsDisplayCode, aStatusErrorVal, aRejectCodePointer, 3, '0');
