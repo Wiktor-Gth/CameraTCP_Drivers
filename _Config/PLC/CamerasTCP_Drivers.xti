@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.19" ClassName="CNestedPlcProjDef">
+	<Project GUID="{091A95F9-A0B8-4752-B6C4-C999C7E160AB}" Name="CamerasTCP_Drivers" PrjFilePath="..\..\CamerasTCP_Drivers\CamerasTCP_Drivers.plcproj" TmcFilePath="..\..\CamerasTCP_Drivers\CamerasTCP_Drivers.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" BootProjectSettings="#x0000" SymbolicMapping="true">
+		<Instance File="CamerasTCP_Drivers Instance.xti"/>
+	</Project>
+</TcSmItem>
