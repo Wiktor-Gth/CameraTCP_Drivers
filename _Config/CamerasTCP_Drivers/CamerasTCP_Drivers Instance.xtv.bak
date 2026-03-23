@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.19" ClassName="CTComPlcObjDef">
+	<Instance TmcHash="{5B32726E-2E03-7529-AAE8-DBE71961D685}">
+		<Vars VarGrpType="1" ContextId="1" AreaNo="16">
+			<Name>TcUnit_Task Inputs</Name>
+			<Var>
+				<Name>GVL.bTriggerButton</Name>
+				<Type>BOOL</Type>
+			</Var>
+		</Vars>
+		<Vars VarGrpType="2" ContextId="1" AreaNo="17">
+			<Name>TcUnit_Task Outputs</Name>
+			<Var>
+				<Name>GVL.bTriggerOutput</Name>
+				<Type>BOOL</Type>
+			</Var>
+		</Vars>
+	</Instance>
+</TcSmItem>

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.19" ClassName="CTComPlcObjDef">
+	<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" XtvPath="CamerasTCP_Drivers\CamerasTCP_Drivers Instance.xtv" TmcPath="CamerasTCP_Drivers\CamerasTCP_Drivers.tmc">
+		<Name>__FILENAME__</Name>
+		<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+		<Contexts>
+			<Context>
+				<Id>0</Id>
+				<Name>PlcTask</Name>
+				<ManualConfig>
+					<OTCID>#x02010030</OTCID>
+				</ManualConfig>
+				<Priority>20</Priority>
+				<CycleTime>20000000</CycleTime>
+			</Context>
+			<Context>
+				<Id>1</Id>
+				<Name>TcUnit_Task</Name>
+				<ManualConfig>
+					<OTCID>#x02010060</OTCID>
+				</ManualConfig>
+				<Priority>25</Priority>
+				<CycleTime>1000000</CycleTime>
+			</Context>
+		</Contexts>
+		<TaskPouOids>
+			<TaskPouOid Prio="20" OTCID="#x08502001"/>
+			<TaskPouOid Prio="25" OTCID="#x08502002"/>
+		</TaskPouOids>
+	</Instance>
+	<Mappings>
+		<OwnerA>
+			<OwnerB Name="TIID^Device 1 (EtherCAT)^Term 1 (EK1100)^Term 3 (EL1008)">
+				<Link VarA="TcUnit_Task Inputs^GVL.bTriggerButton" VarB="Channel 1^GVL.bTriggerButton" Size="1"/>
+			</OwnerB>
+			<OwnerB Name="TIID^Device 1 (EtherCAT)^Term 1 (EK1100)^Term 4 (EL2008)">
+				<Link VarA="TcUnit_Task Outputs^GVL.bTriggerOutput" VarB="Channel 4^GVL.bTriggerOutput" Size="1"/>
+			</OwnerB>
+		</OwnerA>
+	</Mappings>
+</TcSmItem>
