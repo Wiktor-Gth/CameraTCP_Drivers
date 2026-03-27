@@ -5,9 +5,9 @@
 VAR_INPUT
 	bEnableReceive					: BOOL;
 	bEnableSend						: BOOL;
-	strScannerIPAddr				: T_IPv4Addr	:= '192.168.1.45';
-	nReceiveScannerPortNo			: UINT			:= 2010;
-	nSendScannerPortNo				: UINT			:= 4001;	
+	strScannerIPAddr				: T_IPv4Addr;
+	nReceiveScannerPortNo			: UINT;
+	nSendScannerPortNo				: UINT;	
 	stRequestCommand				: E_TCPIP_RequescCommand; (* tutaj powinna byc strukruta z eRequestCommand plus parametry: 0,1 etc *)
 	bSendCommand					: BOOL;
 	bExecutedCommandSend			: BOOL;
@@ -16,13 +16,17 @@ END_VAR
 VAR_OUTPUT
 	eSocketReceiveState		: E_SocketConnectionState;
 	eSocketSendState		: E_SocketConnectionState;
+	strTCPRxStringOut		: T_MaxString;
+	
 END_VAR
 
 VAR
 	fbTCPPortCtrl_Receive	: FB_TCP_ClientPortCtrl;
 	bReceiveConnected		: BOOL;
+	
 	fbTCPortCtrl_Send		: FB_TCP_ClientPortCtrl;
 	bSendConnected			: BOOL;
+	
 	fbTCPReceive			: FB_ReceiveString;
 	bReceiveExpected		: BOOL;
 	fbTCPReceiveAfterSend	: FB_ReceiveString;	
@@ -67,7 +71,7 @@ Connect();
 
 Receive();
 
-	//Send();
+//Send();
 
 Send_Sequence();
 
@@ -101,24 +105,10 @@ fbTCPortCtrl_Send(
 );]]></ST>
       </Implementation>
     </Action>
-    <Action Name="Receive" Id="{708aaa89-8818-4a32-bfe8-6fffb45be551}">
+    <Action Name="Patch" Id="{ded6d77f-fcac-4b9b-8fab-a67220e91170}">
       <Implementation>
         <ST><![CDATA[
-ftrigEnable(CLK := bEnableReceive);
-IF ftrigEnable.Q THEN
-	strTCPRxString := ''; (* clears input buffer *)
-END_IF
 
-(* poll TCP port receive string *)
-fbTCPReceive(
-	bEnable			:= fbTCPPortCtrl_Receive.bConnected,
-	hSocket			:= fbTCPPortCtrl_Receive.hSocket,
-	tUpdateTime		:= T#100MS,
-	strTCPRxString	:= strTCPRxString
-);
-
-
-//*************** quick patch ****************//
 IF fbTCPReceive.bDataReceived THEN
 	GVL.aTCPxStrings[nIndex] := strTCPRxString;
 	nIndex := nIndex + 1;
@@ -138,8 +128,32 @@ IF nIndexReply = 20 THEN
 		GVL.aTCPxStringsReply[nIndex2] := '';		
 	END_FOR
 END_IF
+]]></ST>
+      </Implementation>
+    </Action>
+    <Action Name="Receive" Id="{708aaa89-8818-4a32-bfe8-6fffb45be551}">
+      <Implementation>
+        <ST><![CDATA[
+ftrigEnable(CLK := bEnableReceive);
+IF ftrigEnable.Q THEN
+	strTCPRxString := ''; (* clears input buffer *)
+END_IF
 
-//*************** quick patch ****************//]]></ST>
+(* poll TCP port receive string *)
+fbTCPReceive(
+	bEnable			:= fbTCPPortCtrl_Receive.bConnected,
+	hSocket			:= fbTCPPortCtrl_Receive.hSocket,
+	tUpdateTime		:= T#100MS,
+	strTCPRxString	:= strTCPRxString
+);
+
+//Patch();
+
+IF fbTCPReceive.bDataReceived THEN
+	
+	strTCPRxStringOut := strTCPRxString;	
+	
+END_IF]]></ST>
       </Implementation>
     </Action>
     <Action Name="Send" Id="{4218bcf5-c66e-417f-ac74-e628208b0859}">
@@ -199,6 +213,7 @@ IF rTrigSendCommand.Q  THEN
 	END_IF	
 END_IF
 
+// ------------------- SEND command --------------//
 fbTCPSend(
 	sSrvNetId	:= '',
 	hSocket		:= fbTCPortCtrl_Send.hSocket,
@@ -226,7 +241,7 @@ IF fTrigTCPSendDone.Q = TRUE THEN
 	bReceiveExpected	:= TRUE;
 	
 END_IF
-
+// -------------------RECEIVE REPLY After command SENT --------------//
 fbTCPReceiveAfterSend(
 	bEnable			:= fbTCPortCtrl_Send.bConnected,
 	hSocket			:= fbTCPortCtrl_Send.hSocket,
@@ -234,6 +249,7 @@ fbTCPReceiveAfterSend(
 	strTCPRxString	:= strTCPRxStringReply
 );
 
+// Veryfi if reply to send command is correct //
 rTrigDataReceived(CLK:=fbTCPReceiveAfterSend.bDataReceived);
 IF rTrigDataReceived.Q THEN
 	(*  veryfi valide response *)
@@ -250,6 +266,7 @@ IF rTrigDataReceived.Q THEN
 	bReceiveExpected					:= FALSE;
 	
 END_IF
+
 
 //HeartBeat send every tHeartbeatInterval, IF heartbead doesent reply DO bReInitialiseTCP := TRUE
 fbTON_TcpTimeout(

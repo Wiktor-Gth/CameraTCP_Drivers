@@ -4,7 +4,6 @@
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
 	
-	fbHikrobotScannerCtrl		: FB_SCANNER_HikrobotEXT;
 	
 END_VAR
 ]]></Declaration>
@@ -17,8 +16,9 @@ PRG_ButtonsHandler();
 
 //IO_logic();
 
-fbHikrobotScannerCtrl();
+PRG_HikrobotHandler();
 
+	
 //Outer_IN_Case_Duplicat();]]></ST>
     </Implementation>
   </POU>

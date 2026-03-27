@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="PRG_HikrobotHandler" Id="{f7597285-927c-4d94-9e80-b4662615ca8c}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM PRG_HikrobotHandler
+VAR	
+	
+	fbHikrobotScannerCtrl			: FB_SCANNER_HikrobotEXT;
+	
+	// HIKROBOT Inputs
+	bEnableReceive					: BOOL;
+	bEnableSend						: BOOL;
+	strScannerIPAddr				: T_IPv4Addr	:= '192.168.1.45';
+	nReceiveScannerPortNo			: UINT			:= 2010;
+	nSendScannerPortNo				: UINT			:= 4001;	
+	stRequestCommand				: E_TCPIP_RequescCommand; (* tutaj powinna byc strukruta z eRequestCommand plus parametry: 0,1 etc *)
+	bSendCommand					: BOOL;
+	bExecutedCommandSend			: BOOL;
+	
+	// HIKROBOT Outputs
+	eSocketReceiveState			: E_SocketConnectionState;
+	eSocketSendState			: E_SocketConnectionState;
+	strTCPRxStringOut			: T_MaxString;
+	
+	fbExtractAnyString			: FB_ExtractAnyString();
+	// Extracted String IN_OUT
+	strTCP_HikrobotReceived		: T_MaxString;
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+fbHikrobotScannerCtrl(
+	bEnableReceive:= bEnableReceive, 
+	bEnableSend:= bEnableSend, 
+	strScannerIPAddr:= strScannerIPAddr, 
+	nReceiveScannerPortNo:= nReceiveScannerPortNo, 
+	nSendScannerPortNo:= nSendScannerPortNo, 
+	stRequestCommand:= stRequestCommand, 
+	bSendCommand:= bSendCommand, 
+	bExecutedCommandSend:= bExecutedCommandSend, 
+	eSocketReceiveState=> eSocketReceiveState, 
+	eSocketSendState=> eSocketSendState, 
+	strTCPRxStringOut=> strTCP_HikrobotReceived
+);
+
+fbExtractAnyString(
+	bExtractData:= , 
+	nExtractChars:= , 
+	sPrefix:= , 
+	sSuffix:= , 
+	bIgnoreCase:= , 
+	eExtractMode:= , 
+	sDataString:= strTCP_HikrobotReceived, 
+	bStringFound=> , 
+	sExtractedString=> , 
+	nExtractedStringPos=> , 
+	nExtractedStringLen=> , 
+	nDataStringLen=> 
+);]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
