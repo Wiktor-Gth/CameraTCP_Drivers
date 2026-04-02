@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_CAMERA_BrowserStatus" Id="{0aab0ad2-b1f8-4ea2-905a-0ee2d1a5dd79}">
+    <Declaration><![CDATA[TYPE ST_CAMERA_BrowserStatus :
+STRUCT
+	bBrowseLiveActive			: BOOL;	
+	bBrowseDiagActive			: BOOL;
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

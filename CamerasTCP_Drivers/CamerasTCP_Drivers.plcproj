@@ -31,6 +31,72 @@
     <Compile Include="DUTs\E_TCPIP_State.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DUTs\NewModel\CameraImage\E_CAMERA_State.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\CameraImage\ST_CAMERA_CodeData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\CameraImage\ST_CAMERA_ImageData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\CameraImage\ST_CAMERA_TriggerID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\CameraImage\ST_GS1_AI.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\E_CAMERA_Name.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\Config\E_CAMERA_CodeType.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\Config\E_CAMERA_DeviceType.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\Config\E_CAMERA_Vendor.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\Config\ST_CAMERA_Options.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\Control\ST_CAMERA_BrowseCtrl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\Control\ST_CAMERA_Mapping.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\Status\E_CAMERA_Status.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\Status\ST_CAMERA_BrowserStatus.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\Status\ST_CAMERA_IN.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\Status\ST_CAMERA_OpState.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\Status\ST_CAMERA_OUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\Status\ST_CAMERA_Performance.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\ST_CAMERA_Config.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\ST_CAMERA_Ctrl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\Main Struct\ST_CAMERA_Status.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\NewModel\ST_CAMERA_Evaluation.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DUTs\Test_DUTs\ST_DuplicateInfo.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -44,6 +110,57 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DUTs\T_LongSTRING.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\E_SCANNER_CodeType.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\E_SCANNER_DeviceType.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\E_SCANNER_State.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\E_SCANNER_Vendor.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\ST_SCANNER.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\ST_SCANNER_ApplicationIdentifier.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\ST_SCANNER_CameraMap.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\ST_SCANNER_CodeData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\ST_SCANNER_Config.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\ST_SCANNER_Evaluation.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\ST_SCANNER_ImageData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\ST_SCANNER_ManualCtrl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\ST_SCANNER_OpState.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\ST_SCANNER_Options.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\ST_SCANNER_Performance.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\USED\ST_SCANNER_TriggerID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GVLs\gConstants.TcGVL">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GVLs\GVL.TcGVL">
@@ -76,16 +193,40 @@
     <Compile Include="POUs\MAIN.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\NewModel\FB_CAMERA_Omron.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\NewModel\FB_CAMERA_HIKROBOT.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\PRG_HikrobotHandler.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\SOFTWARE_lib\TCP FBs\FB_TCP_ClientPortCtrl.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\SOFTWARE_lib\TCP FBs\FB_TCP_ClientPortCtrl_V2.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\SOFTWARE_lib\TCP FBs\FB_TCP_CloseAllPorts.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\SOFTWARE_lib\TCP FBs\FB_TCP_ReceiveData_V2.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\SOFTWARE_lib\TCP FBs\FB_TCP_ReceiveLongString.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\SOFTWARE_lib\TCP FBs\FB_TCP_ReceiveString.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\SOFTWARE_lib\TCP FBs\FB_TCP_SendData.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\SOFTWARE_lib\TCP FBs\FB_TCP_ServerPortCtrl.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\StringFBs\FB_ExtractAnyString.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TCP_FB\FB_TCP_ClientPortCtrl.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TCP_FB\FB_ReceiveString.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Tests\FB_FIND_OuterDuplicates.TcPOU">
@@ -103,13 +244,22 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DUTs" />
+    <Folder Include="DUTs\NewModel" />
+    <Folder Include="DUTs\NewModel\CameraImage" />
+    <Folder Include="DUTs\NewModel\Main Struct" />
+    <Folder Include="DUTs\NewModel\Main Struct\Config" />
+    <Folder Include="DUTs\NewModel\Main Struct\Control" />
+    <Folder Include="DUTs\NewModel\Main Struct\Status" />
     <Folder Include="DUTs\Test_DUTs" />
+    <Folder Include="DUTs\USED" />
     <Folder Include="GVLs" />
     <Folder Include="POUs\CAMERAS" />
     <Folder Include="POUs\Addtionals" />
+    <Folder Include="POUs\SOFTWARE_lib" />
+    <Folder Include="POUs\NewModel" />
+    <Folder Include="POUs\SOFTWARE_lib\TCP FBs" />
     <Folder Include="POUs\StringFBs" />
     <Folder Include="POUs\Tests" />
-    <Folder Include="POUs\TCP_FB" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
   </ItemGroup>

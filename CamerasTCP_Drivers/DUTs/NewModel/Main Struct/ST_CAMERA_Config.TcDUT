@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_CAMERA_Config" Id="{56f480ff-8789-4b5e-b081-5fa54c0a83f5}">
+    <Declaration><![CDATA[TYPE ST_CAMERA_Config :     //ST_SCANNER_Config
+STRUCT
+	sDeviceName				: STRING(30) := 'Camera';
+	bDisableCameraUse		: BOOL;
+
+	stCameraIP				: ST_TCPIP_AddressPort;
+	stOptions				: ST_CAMERA_Options;
+	bDontParseAsGS1			: BOOL;
+	
+	tTimeOut				: TIME := T#3S;
+	eCameraVendor			: E_CAMERA_Vendor;
+	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

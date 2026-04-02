@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_CAMERA_OpState" Id="{1f995882-82c8-4711-9ee6-0184e8af78cf}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_CAMERA_OpState : BYTE
+VAR_INPUT
+	bEnable				: BOOL;
+	bConfigMode			: BOOL;
+	bCodeChangeActive	: BOOL;
+	bTCPComsLockedUp	: BOOL;
+	bScannerReady		: BOOL;
+END_VAR
+VAR
+END_VAR
+(*
+	0 = Grey, disabled or offline
+	1 = Blue, configuration mode active
+	2 = Red, alarm active or comms loss
+	3 = Orange, external condition off
+	4 = Yellow, warning active - TCP locked up
+	5 = Green, operational
+*)]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT bEnable AND NOT bConfigMode THEN		
+	
+	F_CAMERA_OpState := 0;
+	
+ELSIF bConfigMode THEN
+	
+	F_CAMERA_OpState := 1;
+	
+ELSIF bEnable AND NOT bConfigMode AND NOT bScannerReady THEN
+	
+	F_CAMERA_OpState := 2;
+	
+ELSIF bEnable AND NOT bConfigMode AND NOT bScannerReady AND bCodeChangeActive THEN
+	
+	F_CAMERA_OpState := 3;
+	
+ELSIF bEnable AND NOT bConfigMode AND NOT bCodeChangeActive AND bTCPComsLockedUp  THEN
+	
+	F_CAMERA_OpState := 4;
+	
+ELSIF bEnable AND NOT bConfigMode AND NOT bTCPComsLockedUp AND NOT bCodeChangeActive AND bScannerReady THEN
+	
+	F_CAMERA_OpState := 5;
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

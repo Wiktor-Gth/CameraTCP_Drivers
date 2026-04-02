@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_CAMERA_Options" Id="{ec15caaf-bc5d-4f18-bac4-0f213643f5ad}">
+    <Declaration><![CDATA[TYPE ST_CAMERA_Options :
+STRUCT
+	eScannerType			: E_CAMERA_DeviceType;
+	eExpectedType			: E_CAMERA_CodeType;
+	bUseExternalLight		: BOOL;
+	nLightingIntensity		: INT;
+	nDisplayDelayConfig		: BOOL;
+
+	nImageBuffer			: INT := 1;
+	nExpectedResp			: INT := 1;
+	
+	aCameraWarningLevel		: INT := 90;
+	sFC1ReplacmentChar		: T_Char;
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

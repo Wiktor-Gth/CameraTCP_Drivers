@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_CAMERA_Performance" Id="{5b782c9f-2d0d-4067-a680-0aea995a5d7d}">
+    <Declaration><![CDATA[TYPE ST_CAMERA_Performance :
+STRUCT
+	tLastDiff 		: TIME;
+	tAverageDiff 	: TIME;
+	arrTimeDiff 	: ARRAY[0..9] OF TIME;
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="E_CAMERA_CodeType" Id="{979c9e20-2703-45dd-b9cd-936e61b93929}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+//{attribute 'strict'}
+TYPE E_CAMERA_CodeType :
+(
+	NONE 		:= 0,
+	OCR			:= 7,
+	DATAMARTIX	:= 10,
+	QR			:= 11,
+	DOTCODE		:= 14,
+	CODE128		:= 20,
+	ITF14		:= 24,
+	EAN13		:= 27,
+	EAN8		:= 28,
+	UNKNOWN		:= 99
+);
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

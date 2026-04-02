@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="E_CAMERA_Status" Id="{72ba5ecf-fcfc-4035-94d0-c0400bf0429f}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+
+TYPE E_CAMERA_Status :
+(
+			
+	DIABLED 		:= 0,		//0 = Grey, disabled OR offline
+	CONFIG			:= 1,		//1 = Blue, configuration mode active
+	ALARM			:= 2,		//2 = Red, alarm active or comms loss
+	EXTERNALOFF		:= 3,		//3 = Orange, external condition off
+	WARNING			:= 4,		//4 = Yellow, warning active
+	OERATIONAL		:= 5		//5 = Green, operational	
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

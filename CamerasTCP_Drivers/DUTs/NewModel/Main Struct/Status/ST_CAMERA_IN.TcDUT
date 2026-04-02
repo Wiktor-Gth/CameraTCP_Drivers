@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_CAMERA_IN" Id="{cfbfb277-6114-4e03-9941-c3d926af33b0}">
+    <Declaration><![CDATA[TYPE ST_CAMERA_IN :
+STRUCT
+	stTriggerID			: ST_CAMERA_TriggerID;	
+	stBrowserStatus		: ST_CAMERA_BrowserStatus;
+	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

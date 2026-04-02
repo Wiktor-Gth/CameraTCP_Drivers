@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_CAMERA_OpState" Id="{d81a1475-23b9-4326-836a-bb2c9131b7e0}">
+    <Declaration><![CDATA[TYPE ST_CAMERA_OpState :
+STRUCT
+	nStatusByte			: BYTE;
+	nErrorCode			: UDINT;
+	nWarningCode		: UDINT;
+
+	bAcceptTrigger		: BOOL;
+	bCodeChangeActive	: BOOL;
+	nActiveTriggers		: INT;
+
+	bTCPComsLockedUp	: BOOL;
+
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

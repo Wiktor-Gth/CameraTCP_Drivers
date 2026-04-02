@@ -5,7 +5,7 @@
 // Works in one cycle but as FB to not use stack memore due to LongString data defined
 FUNCTION_BLOCK FB_ExtractAnyString
 VAR_INPUT
-	bExtractData			: BOOL;			(* set TRUE to remove prefix and suffix from strData *)
+	//bExtractData			: BOOL;			
 	nExtractChars			: UDINT;			(* if suffix is blank, number of data chars to extract *)
 	sPrefix					: T_LongSTRING;	(* prefix string extended from T_MaxString to T_LongSTRING *)
 	sSuffix					: T_LongSTRING;	(* suffix string extended from T_MaxString to T_LongSTRING *)

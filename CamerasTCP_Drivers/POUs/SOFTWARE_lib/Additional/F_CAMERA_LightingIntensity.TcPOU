@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_CAMERA_LightingIntensity" Id="{d2762582-2f5a-4092-a8f1-5b04be1e67bd}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_CAMERA_LightingIntensity : INT
+VAR_INPUT
+	nUnitLightingIntensity		:INT;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[F_CAMERA_LightingIntensity := LREAL_TO_INT(LIMIT(0, INT_TO_LREAL(nUnitLightingIntensity), 100)*32767.0/100);]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

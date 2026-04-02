@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_CAMERA_DecodeGS1" Id="{dca773a8-4c90-42dd-95e3-7cf6d8a4b451}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_CAMERA_DecodeGS1
+VAR_INPUT
+	sGS1String			: T_MaxString;		(* GS1-encoded string returned by scanner *)
+	bDontParseAsGS1		: BOOL;
+END_VAR
+VAR_OUTPUT
+	sBarcode			: T_MaxString;		(* decoded Barcode with AI brackets *)
+	eCodeType			: E_CAMERA_CodeType;	(* code type *)
+END_VAR
+VAR
+	nAIMaxIndex			: UINT;
+	nAIScan				: UINT;
+	nAIIndex			: UINT;
+	fbFieldData			: FB_ExtractString;
+END_VAR
+VAR CONSTANT
+	(* list of supported Application Identifiers *)
+	aAI				: ARRAY[1..8] OF ST_GS1_AI :=[
+						(sAI := '01',		bFixed := TRUE,		nLength := 14),
+						(sAI := '02',		bFixed := FALSE,	nLength := 20),
+						(sAI := '10',		bFixed := FALSE,	nLength := 20),
+						(sAI := '21',		bFixed := FALSE,	nLength := 20),
+						(sAI := '91',		bFixed := FALSE,	nLength := 30),
+						(sAI := '240',		bFixed := FALSE,	nLength := 30),
+						(sAI := '93',		bFixed := FALSE,	nLength := 30),
+						(sAI := '8005',		bFixed := FALSE,	nLength := 6)];
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[(* clear outputs *)
+MEMSET(ADR(sBarcode), 16#00, SIZEOF(sBarcode));
+eCodeType := E_CAMERA_CodeType.NONE;
+
+(* GS1 marker (FNC1) found for DMC *)
+IF F_ToLCase(LEFT(sGS1String, 3)) = ']d2' OR F_ToLCase(LEFT(sGS1String, 3)) = ']d3' THEN
+
+	(* update code type *)
+	eCodeType := E_CAMERA_CodeType.DATAMARTIX;
+
+(* GS1 marker (FNC1) found for DotCode *)
+ELSIF  F_ToLCase(LEFT(sGS1String, 2)) = ']j' THEN
+
+	(* update code type *)
+	eCodeType := E_CAMERA_CodeType.DOTCODE;
+
+(* GS1 marker (FNC1) found for QRCode *)
+ELSIF  F_ToLCase(LEFT(sGS1String, 3)) = ']q1' THEN
+
+	(* update code type *)
+	eCodeType := E_CAMERA_CodeType.QR;
+
+(* GS1 marker (FNC1) found Code128 barcode *)
+ELSIF F_ToLCase(LEFT(sGS1String, 3)) = ']c1' THEN
+
+	(* update code type *)
+	eCodeType := E_CAMERA_CodeType.CODE128;
+
+(* unknown code type *)
+ELSE
+
+	(* pass code through without further modification *)
+	sBarcode := sGS1String;
+	eCodeType := E_CAMERA_CodeType.UNKNOWN;
+END_IF
+
+(* for DMC or Code128 barcode *)
+IF eCodeType = E_CAMERA_CodeType.DATAMARTIX OR eCodeType = E_CAMERA_CodeType.CODE128  OR eCodeType = E_CAMERA_CodeType.DOTCODE OR eCodeType = E_CAMERA_CodeType.QR THEN
+
+	(* remove GS1 marker *)
+	sGS1String := DELETE(sGS1String, 3, 1);
+
+	IF bDontParseAsGS1 THEN
+		sBarcode := sGS1String;
+	ELSE
+		(* total number of supported AI codes *)
+		nAIMaxIndex := SIZEOF(aAI) / SIZEOF(aAI[1]);
+
+		(* ensure 1 full scan per supported AI *)
+		FOR nAIScan := 1 TO nAIMaxIndex DO
+
+			(* scan list of supported AIs *)
+			FOR nAIIndex := 1 TO nAIMaxIndex DO
+
+				(* matching AI found *)
+				IF LEFT(sGS1String, LEN(aAI[nAIIndex].sAI)) = aAI[nAIIndex].sAI THEN
+
+					(* fixed length AI *)
+					IF aAI[nAIIndex].bFixed = TRUE THEN
+
+						(* extract data based on AI length and fixed field length *)
+						fbFieldData(
+							bExtractData	:= TRUE,
+							nExtractChars	:= aAI[nAIIndex].nLength,
+							strPrefix		:= aAI[nAIIndex].sAI,
+							strSuffix		:= '',
+							strString		:= sGS1String
+						);
+
+					(* variable length AI *)
+					ELSE
+
+						(* extract data based on position of <GS> field delimiter *)
+						fbFieldData(
+							bExtractData	:= TRUE,
+							nExtractChars	:= 0,
+							strPrefix		:= aAI[nAIIndex].sAI,
+							strSuffix		:= '$1D', (*'~1'*)
+							strString		:= sGS1String
+						);
+
+						(* <GS> not found *)
+						IF fbFieldData.bStringFound = FALSE THEN
+
+							(* variable length AI does not have <GS> if it is the last field in the code *)
+							fbFieldData(
+								bExtractData	:= TRUE,
+								nExtractChars	:= 255,
+								strPrefix		:= aAI[nAIIndex].sAI,
+								strSuffix		:= '',
+								strString		:= sGS1String
+							);
+						END_IF
+					END_IF
+
+					(* AI field found *)
+					IF fbFieldData.bStringFound = TRUE THEN
+
+						(* construct output string with bracket around the AI *)
+						sBarcode := F_CONCAT5(sBarcode, '(', aAI[nAIIndex].sAI, ')', fbFieldData.strData);
+						EXIT;
+					END_IF
+				END_IF
+			END_FOR
+
+			(* all chars processed *)
+			IF LEN(sGS1String) = 0 THEN
+
+				EXIT;
+			END_IF
+		END_FOR;
+	END_IF
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

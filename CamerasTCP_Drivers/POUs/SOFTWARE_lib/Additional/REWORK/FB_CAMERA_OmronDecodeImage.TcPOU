@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_CAMERA_OmronDecodeImage" Id="{41b88705-0d83-4a15-b6f5-2e7364d3f847}" SpecialFunc="None">
+    <Declaration><![CDATA[(* decodes scan response message *)
+FUNCTION_BLOCK FB_CAMERA_OmronDecodeImage
+VAR_INPUT
+	bExecute			: BOOL;		(* set TRUE to decode image response *)
+	stTriggerID			: ST_CAMERA_TriggerID;		(* response ID *)
+	bDontParseAsGS1		: BOOL;
+END_VAR
+VAR_IN_OUT
+	sImageDataRecived	: T_LongString;	(* scan response message *)
+END_VAR
+VAR_OUTPUT
+	bDone				: BOOL;		(* TRUE = decode complete *)
+	bBusy				: BOOL;		(* TRUE = decode is progress *)
+	bError				: BOOL;		(* TRUE = error *)
+	sImageStatus		: T_MaxString;	(* status description, returns scanner error message in case of failed read *)
+	stImageData			: ST_CAMERA_ImageData;	(* array of code data *)
+END_VAR
+VAR
+	fbExecute			: R_TRIG;
+	nMaxIndex			: UINT;
+	nIndex				: UINT;
+	sCodeDataRecived	: T_LongString;	
+	fbCodeData			: FB_ExtractAnyString;
+	fbFieldData			: FB_ExtractAnyString;
+	fbDecodeGS1			: FB_CAMERA_DecodeGS1;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[(* rising edge of bExecute *)
+
+fbExecute(CLK := bExecute);
+IF fbExecute.Q = TRUE THEN
+
+	(* max number of images that can be handled *)
+	nMaxIndex := SIZEOF(stImageData.aCodeData) / SIZEOF(stImageData.aCodeData[1]);
+	
+	(* clear outputs *)
+	bDone := FALSE;
+	bBusy := TRUE;
+	bError := FALSE;
+	sImageStatus := '';
+	MEMSET(ADR(stImageData), 16#00, SIZEOF(stImageData));
+
+	(* initialise for decode scan *)
+	nIndex := 0;
+
+(* decode not active *)
+ELSIF bExecute = FALSE AND bBusy = FALSE THEN
+
+	bDone := FALSE;
+	bBusy := FALSE;
+	bError := FALSE;
+END_IF
+
+(* decode active *)
+IF bBusy = TRUE THEN
+	
+	REPEAT
+		(* get image data message *)
+		fbCodeData(
+			nExtractChars		:= 0, 
+			sPrefix				:= '$02', 
+			sSuffix				:= '$03', 
+			bIgnoreCase			:= FALSE, 
+			eExtractMode 		:= E_STRING_ExtrMode.WITHOUTIDENT_REMIDENT, 
+			sDataString			:= sImageDataRecived, 
+			bStringFound		=>, 
+			sExtractedString	=> sCodeDataRecived, 
+			nExtractedStringPos	=>,
+			nExtractedStringLen	=>,
+			nDataStringLen		=> 
+		);
+		
+	
+		(* code data found *)
+		IF fbCodeData.bStringFound THEN
+	
+			(* next code index *)
+			nIndex := nIndex + 1;
+	
+			//Code Type field (CT=%t;)			
+			fbFieldData(
+				nExtractChars		:= 0, 
+				sPrefix				:= 'CT=',
+				sSuffix				:= ';', 
+				bIgnoreCase			:= FALSE, 
+				eExtractMode 		:= E_STRING_ExtrMode.WITHOUTIDENT_REMIDENT_PURGE, 
+				sDataString			:= sCodeDataRecived, 
+				bStringFound		=>, 
+				sExtractedString	=>, 
+				nExtractedStringPos	=>,
+				nExtractedStringLen	=>,
+				nDataStringLen		=> 
+			);
+			IF fbFieldData.bStringFound = TRUE THEN
+	
+				(* extract data value *)
+				stImageData.aCodeData[nIndex].eCodeType := STRING_TO_INT(fbFieldData.sExtractedString);
+			END_IF
+	
+			(* Data String field NOREAD found *)
+			IF FIND(sCodeDataRecived, 'NOREAD') <> 0 THEN
+	
+				stImageData.aCodeData[nIndex].sDataString := '';
+			ELSE
+				(* Data String field (DS=%s;) *)
+				fbFieldData(
+					nExtractChars		:= 0, 
+					sPrefix				:= 'DS=',
+					sSuffix				:= '$1E',
+					bIgnoreCase			:= FALSE, 
+					eExtractMode 		:= E_STRING_ExtrMode.WITHOUTIDENT_REMIDENT_PURGE, 
+					sDataString			:= sCodeDataRecived, 
+					bStringFound		=>, 
+					sExtractedString	=>, 
+					nExtractedStringPos	=>,
+					nExtractedStringLen	=>,
+					nDataStringLen		=> 
+				);
+				IF fbFieldData.bStringFound = TRUE THEN
+					
+					stImageData.nCodesRead := stImageData.nCodesRead + 1;
+	
+					(* extract data value and decode if GS1 markers found *)
+					fbDecodeGS1(
+						sGS1String		:= fbFieldData.sExtractedString,
+						bDontParseAsGS1 := bDontParseAsGS1,
+						sBarcode		=> stImageData.aCodeData[nIndex].sDataString 
+					);
+				END_IF
+			END_IF
+	
+			(*Overwirte code type from code symbology identifier if type is known *)
+			IF fbDecodeGS1.eCodeType <> E_CAMERA_CodeType.UNKNOWN THEN
+				stImageData.aCodeData[nIndex].eCodeType := fbDecodeGS1.eCodeType;
+			END_IF
+	
+			stImageData.tScanTime := INT_TO_TIME(STRING_TO_INT(LEFT(sCodeDataRecived, 3)));
+	
+			(* update Scanner Index *)
+			stImageData.aCodeData[nIndex].nScannerIndex := stTriggerID.nScannerIndex;
+		END_IF
+	
+	UNTIL NOT fbCodeData.bStringFound  OR nIndex = nMaxIndex END_REPEAT
+
+	(* generate output values *)
+	sImageStatus 			:= CONCAT(INT_TO_STRING(stImageData.nCodesRead), ' code(s) read');
+
+	bBusy := FALSE;
+	bDone := TRUE;
+
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
